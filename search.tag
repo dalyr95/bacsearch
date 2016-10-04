@@ -1,8 +1,10 @@
 <search>
     <div>
+        <h1>Search New &amp; Used Cars for Sale</h1>
+
         <div class="search_sidebar">
             <form class="search_form" onsubmit={ searchSubmit }>
-                <input type="text" name="search-cars" />
+                <input type="text" name="search-cars" onkeyup={ search }/>
                 <button>Search</button>
             </form>
             <h4 class="search_refine">
@@ -13,32 +15,46 @@
                 <div class="search_filter_show">
                     Show:
                     <ul>
-                        <li>Used</li>
-                        <li>New</li>
-                        <li>Lease</li>
+                        <li onclick={ carType } data-type="used" class={ (state.carType.indexOf('used') > -1) ? 'active' : '' }>Used</li>
+                        <li onclick={ carType } data-type="new" class={ (state.carType.indexOf('new') > -1) ? 'active' : '' }>New</li>
+                        <li onclick={ carType } data-type="lease" class={ (state.carType.indexOf('lease') > -1) ? 'active' : '' }>Lease</li>
                     </ul>
                 </div>
 
                 <div class="search_filters_dropdowns">
-                    <div>
-                        <h6>Make</h6>
-                        <ul>
-                            <li>Make 1</li>
-                            <li>Make 2</li>
-                            <li>Make 3</li>
-                            <li>Make 4</li>
-                            <li>Make 5</li>
+                    <div class={ (state.filtersOpen.indexOf('make') > -1) ? 'open' : '' }>
+                        <h6 data-filter="make" onclick={ filters }>Make</h6>
+                        <div class="search_filters_selected">
+                            <ul>
+                                <li each={ key, value in state.filtersSelected.make } data-filter="make" data-option={ key } onClick={ removeFilter }>
+                                    <span>{ value }</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <ul class="search_filters_options" onclick={ filterOption }>
+                            <li data-option="make-1">Make 1</li>
+                            <li data-option="make-2">Make 2</li>
+                            <li data-option="make-3">Make 3</li>
+                            <li data-option="make-4">Make 4</li>
+                            <li data-option="make-5">Make 5</li>
                         </ul>
                     </div>
 
-                    <div>
-                        <h6>Model</h6>
-                        <ul>
-                            <li>Model 1</li>
-                            <li>Model 2</li>
-                            <li>Model 3</li>
-                            <li>Model 4</li>
-                            <li>Model 5</li>
+                    <div class={ (state.filtersOpen.indexOf('model') > -1) ? 'open' : '' }>
+                        <h6 data-filter="model" onclick={ filters }>Model</h6>
+                        <div class="search_filters_selected">
+                            <ul>
+                                <li each={ key, value in state.filtersSelected.model } data-filter="model" data-option={ key } onClick={ removeFilter }>
+                                    <span>{ value }</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <ul class="search_filters_options" onclick={ filterOption }>
+                            <li data-option="model-1">Model 1</li>
+                            <li data-option="model-2">Model 2</li>
+                            <li data-option="model-3">Model 3</li>
+                            <li data-option="model-4">Model 4</li>
+                            <li data-option="model-5">Model 5</li>
                         </ul>
                     </div>
                 </div>
@@ -68,8 +84,12 @@
 
         this.state = {
             loading: true,
-            cars: null
-        }
+            cars: null,
+            filtersOpen: [],
+            carType: [],
+            filtersSelected: {},
+            searchTerm: null
+        };
 
         XHR = function(cb, data) {
             var xhr = new XMLHttpRequest();
@@ -92,6 +112,58 @@
             this.state.cars     = data;
             this.update();
         }.bind(this);
+
+        filters = function(e) {
+            e.preventDefault();
+
+            var filter  = e.currentTarget.dataset.filter;
+            var index   = this.state.filtersOpen.indexOf(filter);
+
+            if (index === -1) {
+                this.state.filtersOpen.push(filter);
+            } else {
+                this.state.filtersOpen.splice(index, 1);
+            }
+        }
+
+        filterOption = function(e) {
+            var filter = e.currentTarget.previousElementSibling.previousElementSibling.dataset.filter;
+            var option = e.target.dataset.option;
+
+            if (this.state.filtersSelected[filter] && this.state.filtersSelected[filter][option]) {
+                delete this.state.filtersSelected[filter][option];
+            } else if (this.state.filtersSelected[filter]) {
+                this.state.filtersSelected[filter][option] = e.target.innerText;
+            } else {
+                this.state.filtersSelected[filter] = {};
+                this.state.filtersSelected[filter][option] = e.target.innerText;
+            }
+        }
+
+        removeFilter = function(e) {
+            e.preventDefault();
+            console.log(e.currentTarget.dataset);
+            var data = e.currentTarget.dataset;
+
+            delete this.state.filtersSelected[data.filter][data.option];
+        }
+
+        carType = function(e) {
+            e.preventDefault();
+
+            var type    = e.currentTarget.dataset.type;
+            var index   = this.state.carType.indexOf(type);
+
+            if (index === -1) {
+                this.state.carType.push(type);
+            } else {
+                this.state.carType.splice(index, 1);
+            }
+        }
+
+        search = function(e) {
+            this.state.searchTerm = (e.currentTarget.value.length > 0) ? e.currentTarget.value : null;
+        }
 
         this.on('mount', function() {
             console.log('mount!');
@@ -174,6 +246,7 @@
                 margin-left: 10px;
                 padding: 0 10px 0 26px;
                 position: relative;
+                transition: background-color 0.05s linear, border-color 0.05s linear;
                 -webkit-user-select: none;
                 -moz-user-select: none;
                 -ms-user-select: none;
@@ -197,9 +270,21 @@
                 width: 6px;
             }
 
+            .search_sidebar .search_filter_show li.active {
+                background-color: #ff8100;
+                border-color: #ff8100;
+                color: #fff;
+            }
+
+            .search_sidebar .search_filter_show li.active::before {
+                border-color: #fff;
+            }
+
             .search_sidebar .search_filters_dropdowns > div {
                 border-bottom: 1px solid #d3d3d3;
-                padding: 5px;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
             }
 
             .search_sidebar .search_filters_dropdowns > div:first-child {
@@ -208,11 +293,108 @@
 
             .search_sidebar .search_filters_dropdowns h6 {
                 cursor: pointer;
+                padding: 5px;
+                position: relative;
             }
 
-            .search_sidebar .search_filters_dropdowns ul {
+            .search_sidebar .search_filters_dropdowns h6:active {
+                background-color: #ff8100;
+                color: #fff;
+            }
+
+            .search_sidebar .search_filters_dropdowns h6::after {
+                border:  2px solid #454545;
+                border-bottom: 0;
+                border-left: 0;
+                content: '';
+                display: block;
+                height: 8px;
+                position: absolute;
+                right: 10px;
+                top: 2px;
+                width: 8px;
+                transform: rotate(45deg);
+                transition: transform 0.05s linear;
+            }
+
+            .search_sidebar .search_filters_dropdowns .open h6::after {
+                transform: rotate(135deg);
+            }
+
+            .search_sidebar .search_filters_dropdowns .search_filters_options {
                 overflow: hidden;
                 height: 0;
+            }
+
+            .search_sidebar .search_filters_dropdowns .open .search_filters_options {
+                height: auto;
+            }
+
+            .search_sidebar .search_filters_dropdowns .search_filters_options li {
+                cursor: pointer;
+                padding: 2px 5px;
+            }
+
+            .search_sidebar .search_filters_dropdowns .search_filters_options li:hover {
+                background-color: #ebebeb;
+            }
+
+            .search_sidebar .search_filters_dropdowns .search_filters_options li:active {
+                background-color: #ff8100;
+                color: #fff;
+            }
+
+            .search_sidebar .search_filters_selected li {
+                border-radius: 4px;
+                border: 1px solid #fe8100;
+                cursor: pointer;
+                display: inline-block;
+                height: 32px;
+                line-height: 30px;
+                margin-bottom: 4px;
+                margin-right: 4px;
+                max-width: 0;
+                position: relative;
+                overflow: hidden;
+                animation-duration: 0.4s;
+                animation-fill-mode: forwards;
+                animation-name: filterSlide;
+            }
+
+            @keyframes filterSlide {
+                from {
+                    max-width: 0;
+                }
+
+                to {
+                    max-width: 500px;
+                }
+            }
+
+            .search_sidebar .search_filters_selected li span {
+                padding: 0 8px 0 28px;
+            }
+
+            .search_sidebar .search_filters_selected li span::before {
+                border-radius: 100%;
+                border: 1px solid #fe8100;
+                color: #fe8100;
+                content: '\00D7';
+                display: block;
+                font-size: 18px;
+                height: 16px;
+                line-height: 16px;
+                position: absolute;
+                text-align: center;
+                left: 6px;
+                text-indent: -1px;
+                width: 16px;
+                top: 6px;
+            }
+
+            .search_sidebar .search_filters_selected li:hover span::before {
+                background-color: #fe8100;
+                color: #fff;
             }
 
 
