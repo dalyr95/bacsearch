@@ -32,11 +32,11 @@
                             </ul>
                         </div>
                         <ul class="search_filters_options" onclick={ filterOption }>
-                            <li data-option="make-1">Make 1</li>
-                            <li data-option="make-2">Make 2</li>
-                            <li data-option="make-3">Make 3</li>
-                            <li data-option="make-4">Make 4</li>
-                            <li data-option="make-5">Make 5</li>
+                            <li data-option="make-1" class={ selected : state.filtersSelected.make['make-1'] }>Make 1</li>
+                            <li data-option="make-2" class={ selected : state.filtersSelected.make['make-2'] }>Make 2</li>
+                            <li data-option="make-3" class={ selected : state.filtersSelected.make['make-3'] }>Make 3</li>
+                            <li data-option="make-4" class={ selected : state.filtersSelected.make['make-4'] }>Make 4</li>
+                            <li data-option="make-5" class={ selected : state.filtersSelected.make['make-5'] }>Make 5</li>
                         </ul>
                     </div>
 
@@ -50,11 +50,11 @@
                             </ul>
                         </div>
                         <ul class="search_filters_options" onclick={ filterOption }>
-                            <li data-option="model-1">Model 1</li>
-                            <li data-option="model-2">Model 2</li>
-                            <li data-option="model-3">Model 3</li>
-                            <li data-option="model-4">Model 4</li>
-                            <li data-option="model-5">Model 5</li>
+                            <li data-option="model-1" class={ selected : state.filtersSelected.model['model-1'] }>Model 1</li>
+                            <li data-option="model-2" class={ selected : state.filtersSelected.model['model-2'] }>Model 2</li>
+                            <li data-option="model-3" class={ selected : state.filtersSelected.model['model-3'] }>Model 3</li>
+                            <li data-option="model-4" class={ selected : state.filtersSelected.model['model-4'] }>Model 4</li>
+                            <li data-option="model-5" class={ selected : state.filtersSelected.model['model-5'] }>Model 5</li>
                         </ul>
                     </div>
                 </div>
@@ -64,15 +64,19 @@
 
         <div class="search_results {state.loading === true ? 'loading' : ''}">
             <ul>
-                <li each={ state.cars } class="search_result">
+                <li each={ value, key in state.cars } class="search_result" style="animation-delay: {key * 100 + 150}ms;">
                     <span class="search_result_image">
-                        <img src="//images.buyacar.co.uk/img/med/{ prodHomeIntImageFileName }" alt={ imgAltString } />
+                        <img src="//images.buyacar.co.uk/img/med/{ value.prodHomeIntImageFileName }" alt={ imgAltString } />
                     </span>
                     <div class="search_result_content">
-                        <h2>{ fullName }</h2>
+                        <h2>{ value.fullName }</h2>
                         <p>More info on this car</p>
                     </div>
-                    <a href={ prodHomeUrlPath }></a>
+                    <div class="search_result_price">
+                        { currency }{ value.cheapestAdvertPrice }
+                        <p>Or from<strong>{ currency }{ parseInt(value.cheapestFinancePaymentAmount, 10) }<sup>*</sup></strong>Per Month</p>
+                    </div>
+                    <a href={ value.prodHomeUrlPath }></a>
                 </li>
             </ul>
         </div>
@@ -81,6 +85,9 @@
 
     <script>
         window.tag = this;
+
+        this.currency   = '£';
+        this.delay      = 0;
 
         this.state = {
             loading: true,
@@ -138,14 +145,17 @@
                 this.state.filtersSelected[filter] = {};
                 this.state.filtersSelected[filter][option] = e.target.innerText;
             }
+
+            shuffleCars();
         }
 
         removeFilter = function(e) {
             e.preventDefault();
-            console.log(e.currentTarget.dataset);
             var data = e.currentTarget.dataset;
 
             delete this.state.filtersSelected[data.filter][data.option];
+
+            shuffleCars();
         }
 
         carType = function(e) {
@@ -159,14 +169,38 @@
             } else {
                 this.state.carType.splice(index, 1);
             }
+
+            shuffleCars();
         }
 
         search = function(e) {
             this.state.searchTerm = (e.currentTarget.value.length > 0) ? e.currentTarget.value : null;
         }
 
+        // Temp hack to make it look like something is happening
+        shuffle = function(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
+
+        shuffleCars = function() {
+            this.state.cars = shuffle(this.state.cars);
+        }.bind(this);
+
         this.on('mount', function() {
-            console.log('mount!');
             XHR(displayResults);
         });
     </script>
@@ -180,6 +214,7 @@
             :scope {
                 display: block;
                 margin: 0 auto;
+                min-height: calc(100vh + 1px);
                 max-width: 1160px;
                 overflow: hidden;
                 width: 100%;
@@ -335,6 +370,15 @@
                 padding: 2px 5px;
             }
 
+            .search_sidebar .search_filters_dropdowns .search_filters_options li.selected {
+                background-color: rgba(254, 129, 0, 0.5);
+            }
+
+            .search_sidebar .search_filters_dropdowns .search_filters_options li.selected:hover {
+                background-color: rgba(254, 129, 0, 1);
+                color: #fff;
+            }
+
             .search_sidebar .search_filters_dropdowns .search_filters_options li:hover {
                 background-color: #ebebeb;
             }
@@ -436,6 +480,24 @@
                 padding:  10px;
                 position: relative;
                 overflow: hidden;
+                opacity: 0;
+                animation-name: slideIn;
+                animation-fill-mode: forwards;
+                animation-duration: 0.2s;
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateX(-50px);
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
             }
 
             .search_results .search_result .search_result_image {
@@ -454,8 +516,29 @@
 
             .search_results .search_result .search_result_content {
                 float: left;
-                margin-left: 10px;
-                max-width: calc(100% - 40% - 10px);
+                margin: 0 10px;
+                max-width: calc(100% - 40% - 10px - 110px);
+            }
+
+            .search_results .search_result .search_result_price {
+                float: right;
+                text-align: center;
+                width: 100px;
+            }
+
+            .search_results .search_result .search_result_price p {
+                background-color: #e7e7e7;
+                color: #223947;
+                padding: 10px 0;
+                position: absolute;
+                top: 40%;
+                width: 100px;
+            }
+
+            .search_results .search_result .search_result_price p strong {
+                display: block;
+                font-size: 150%;
+                text-indent: 8px;
             }
 
             .search_results .search_result a {
