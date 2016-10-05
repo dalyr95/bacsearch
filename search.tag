@@ -15,9 +15,9 @@
                 <div class="search_filter_show">
                     Show:
                     <ul>
-                        <li onclick={ carType } data-type="used" class={ (state.carType.indexOf('used') > -1) ? 'active' : '' }>Used</li>
-                        <li onclick={ carType } data-type="new" class={ (state.carType.indexOf('new') > -1) ? 'active' : '' }>New</li>
-                        <li onclick={ carType } data-type="lease" class={ (state.carType.indexOf('lease') > -1) ? 'active' : '' }>Lease</li>
+                        <li onclick={ carType } data-type="used" class={ (state.filters.carType === 'used') ? 'active' : '' }>Used</li>
+                        <li onclick={ carType } data-type="new" class={ (state.filters.carType === 'new') ? 'active' : '' }>New</li>
+                        <li onclick={ carType } data-type="lease" class={ (state.filters.carType === 'lease') ? 'active' : '' }>Lease</li>
                     </ul>
                 </div>
 
@@ -26,17 +26,17 @@
                         <h6 data-filter="make" onclick={ filters }>Make</h6>
                         <div class="search_filters_selected">
                             <ul>
-                                <li each={ key, value in state.filtersSelected.make } data-filter="make" data-option={ key } onClick={ removeFilter }>
+                                <li each={ key, value in state.filters.filtersSelected.make } data-filter="make" data-option={ key } onClick={ removeFilter }>
                                     <span>{ value }</span>
                                 </li>
                             </ul>
                         </div>
                         <ul class="search_filters_options" onclick={ filterOption }>
-                            <li data-option="make-1" class={ selected : state.filtersSelected.make['make-1'] }>Make 1</li>
-                            <li data-option="make-2" class={ selected : state.filtersSelected.make['make-2'] }>Make 2</li>
-                            <li data-option="make-3" class={ selected : state.filtersSelected.make['make-3'] }>Make 3</li>
-                            <li data-option="make-4" class={ selected : state.filtersSelected.make['make-4'] }>Make 4</li>
-                            <li data-option="make-5" class={ selected : state.filtersSelected.make['make-5'] }>Make 5</li>
+                            <li data-option="make-1" class={ selected : state.filters.filtersSelected.make['make-1'] }>Make 1</li>
+                            <li data-option="make-2" class={ selected : state.filters.filtersSelected.make['make-2'] }>Make 2</li>
+                            <li data-option="make-3" class={ selected : state.filters.filtersSelected.make['make-3'] }>Make 3</li>
+                            <li data-option="make-4" class={ selected : state.filters.filtersSelected.make['make-4'] }>Make 4</li>
+                            <li data-option="make-5" class={ selected : state.filters.filtersSelected.make['make-5'] }>Make 5</li>
                         </ul>
                     </div>
 
@@ -44,17 +44,17 @@
                         <h6 data-filter="model" onclick={ filters }>Model</h6>
                         <div class="search_filters_selected">
                             <ul>
-                                <li each={ key, value in state.filtersSelected.model } data-filter="model" data-option={ key } onClick={ removeFilter }>
+                                <li each={ key, value in state.filters.filtersSelected.model } data-filter="model" data-option={ key } onClick={ removeFilter }>
                                     <span>{ value }</span>
                                 </li>
                             </ul>
                         </div>
                         <ul class="search_filters_options" onclick={ filterOption }>
-                            <li data-option="model-1" class={ selected : state.filtersSelected.model['model-1'] }>Model 1</li>
-                            <li data-option="model-2" class={ selected : state.filtersSelected.model['model-2'] }>Model 2</li>
-                            <li data-option="model-3" class={ selected : state.filtersSelected.model['model-3'] }>Model 3</li>
-                            <li data-option="model-4" class={ selected : state.filtersSelected.model['model-4'] }>Model 4</li>
-                            <li data-option="model-5" class={ selected : state.filtersSelected.model['model-5'] }>Model 5</li>
+                            <li data-option="model-1" class={ selected : state.filters.filtersSelected.model['model-1'] }>Model 1</li>
+                            <li data-option="model-2" class={ selected : state.filters.filtersSelected.model['model-2'] }>Model 2</li>
+                            <li data-option="model-3" class={ selected : state.filters.filtersSelected.model['model-3'] }>Model 3</li>
+                            <li data-option="model-4" class={ selected : state.filters.filtersSelected.model['model-4'] }>Model 4</li>
+                            <li data-option="model-5" class={ selected : state.filters.filtersSelected.model['model-5'] }>Model 5</li>
                         </ul>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
             <ul>
                 <li each={ value, key in state.cars } class="search_result" style="animation-delay: {key * 100 + 150}ms;">
                     <span class="search_result_image">
-                        <img src="//images.buyacar.co.uk/img/med/{ value.prodHomeIntImageFileName }" alt={ imgAltString } />
+                        <img src="//images.buyacar.co.uk/img/med/{ value.prodHomeIntImageFileName }" alt={ imgAltString } onload="this.style.opacity = 1;" />
                     </span>
                     <div class="search_result_content">
                         <h2>{ value.fullName }</h2>
@@ -93,9 +93,11 @@
             loading: true,
             cars: null,
             filtersOpen: [],
-            carType: [],
-            filtersSelected: {},
-            searchTerm: null
+            filters: {
+                carType: null,
+                filtersSelected: {},
+                searchTerm: null
+            }
         };
 
         XHR = function(cb, data) {
@@ -137,44 +139,37 @@
             var filter = e.currentTarget.previousElementSibling.previousElementSibling.dataset.filter;
             var option = e.target.dataset.option;
 
-            if (this.state.filtersSelected[filter] && this.state.filtersSelected[filter][option]) {
-                delete this.state.filtersSelected[filter][option];
-            } else if (this.state.filtersSelected[filter]) {
-                this.state.filtersSelected[filter][option] = e.target.innerText;
+            if (this.state.filters.filtersSelected[filter] && this.state.filters.filtersSelected[filter][option]) {
+                delete this.state.filters.filtersSelected[filter][option];
+            } else if (this.state.filters.filtersSelected[filter]) {
+                this.state.filters.filtersSelected[filter][option] = e.target.innerText;
             } else {
-                this.state.filtersSelected[filter] = {};
-                this.state.filtersSelected[filter][option] = e.target.innerText;
+                this.state.filters.filtersSelected[filter] = {};
+                this.state.filters.filtersSelected[filter][option] = e.target.innerText;
             }
 
-            shuffleCars();
+            getNewCars();
         }
 
         removeFilter = function(e) {
             e.preventDefault();
             var data = e.currentTarget.dataset;
 
-            delete this.state.filtersSelected[data.filter][data.option];
+            delete this.state.filters.filtersSelected[data.filter][data.option];
 
-            shuffleCars();
+            getNewCars();
         }
 
         carType = function(e) {
             e.preventDefault();
 
-            var type    = e.currentTarget.dataset.type;
-            var index   = this.state.carType.indexOf(type);
+            this.state.filters.carType = e.currentTarget.dataset.type;
 
-            if (index === -1) {
-                this.state.carType.push(type);
-            } else {
-                this.state.carType.splice(index, 1);
-            }
-
-            shuffleCars();
+            getNewCars();
         }
 
         search = function(e) {
-            this.state.searchTerm = (e.currentTarget.value.length > 0) ? e.currentTarget.value : null;
+            this.state.filters.searchTerm = (e.currentTarget.value.length > 0) ? e.currentTarget.value : null;
         }
 
         // Temp hack to make it look like something is happening
@@ -196,7 +191,17 @@
             return array;
         }
 
-        shuffleCars = function() {
+        getNewCars = function() {
+            console.log('getNewCars', this.state);
+            var filters = this.state.filters;
+
+            Object.keys(filters).forEach(function(key) {
+                console.log(filters[key]);
+                if (filters[key]) {
+                    console.log(1, filters[key]);
+                }
+            });
+
             this.state.cars = shuffle(this.state.cars);
         }.bind(this);
 
@@ -512,6 +517,8 @@
             .search_results .search_result .search_result_image img {
                 position: absolute;
                 width: 100%;
+                opacity: 0;
+                transition: opacity 0.4s linear;
             }
 
             .search_results .search_result .search_result_content {
