@@ -128,6 +128,7 @@
       xhr.send();
 
       query = (query.length === 0) ? '?' : query;
+
       window.history.pushState({}, '', query);
 
       return xhr;
@@ -266,6 +267,39 @@
       XHR(displayResults, query);
 
     }.bind(this);
+
+    var parseQueryString = function( queryString ) {
+      var params = {}, queries, temp, i, l;
+      // Split into key/value pairs
+      queries = queryString.split('&');
+      // Convert the array of strings into an object
+      for ( i = 0, l = queries.length; i < l; i++ ) {
+        temp = queries[i].split('=');
+        params[temp[0]] = temp[1];
+      }
+      return params;
+    };
+
+    this.on('before-mount', function() {
+      var query   = window.location.search.replace(/^\?/, '');
+      query       = parseQueryString(query);
+      var filters = this.state.filters;
+
+      Object.keys(query).forEach(function( key ) {
+        if ( filters.hasOwnProperty(key) ) {
+          filters[key] = query[key];
+        } else {
+          if (query[key]) {
+            var values = query[key].split(',');
+
+            values.forEach(function(v) {
+                filters.filtersSelected[key]    = filters.filtersSelected[key] || {};
+                filters.filtersSelected[key][v] = true;
+            });
+          }
+        }
+      });
+    });
 
     this.on('mount', function() {
       XHR(displayResults);
