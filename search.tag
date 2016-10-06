@@ -87,7 +87,6 @@
         window.tag = this;
 
         this.currency   = '£';
-        this.delay      = 0;
 
         this.state = {
             loading: true,
@@ -140,12 +139,12 @@
             var option = e.target.dataset.option;
 
             if (this.state.filters.filtersSelected[filter] && this.state.filters.filtersSelected[filter][option]) {
-                delete this.state.filters.filtersSelected[filter][option];
+                delete this.state.filters.filtersSelected[filter][option]; // Delete already selected option
             } else if (this.state.filters.filtersSelected[filter]) {
-                this.state.filters.filtersSelected[filter][option] = e.target.innerText;
+                this.state.filters.filtersSelected[filter][option] = e.target.innerText; // If filter already has one selected, then add new option
             } else {
-                this.state.filters.filtersSelected[filter] = {};
-                this.state.filters.filtersSelected[filter][option] = e.target.innerText;
+                this.state.filters.filtersSelected[filter] = {};    // If filter hasn't got anything selected, then create
+                this.state.filters.filtersSelected[filter][option] = e.target.innerText;    // and add option
             }
 
             getNewCars();
