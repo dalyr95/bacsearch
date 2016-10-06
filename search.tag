@@ -5,7 +5,7 @@
 
   <div class="search_sidebar">
     <form class="search_form" onsubmit={ searchSubmit }>
-      <input type="text" name="search-cars" onkeyup={ search }/>
+      <input type="text" name="search-cars" value={ state.filters.searchTerm } onkeyup={ search }/>
       <button>Search</button>
     </form>
     <h4 class="search_refine">
@@ -151,7 +151,6 @@
     };
 
     searchSubmit = function(e) {
-      console.log('searchSubmit');
       e.preventDefault();
     }
 
@@ -326,7 +325,6 @@
     });
 
     this.on('mount', function() {
-      console.log(12, window.location.search);
       var query = (window.location.search.length > 1) ? window.location.search.replace(/^\?/, '') : null;
       XHR(displayResults, query);
     });
