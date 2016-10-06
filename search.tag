@@ -99,12 +99,13 @@
             }
         };
 
-        XHR = function(cb, data) {
+        XHR = function(cb, query) {
             var xhr = new XMLHttpRequest();
+            query = (query) ? '?' + query : '';
             xhr.addEventListener('load', function(data) {
                 cb(JSON.parse(data.currentTarget.responseText));
             });
-            xhr.open('GET', 'http://dev2.buyacar.co.uk/cars/new_cars_json.jhtml', true);
+            xhr.open('GET', 'http://dev2.buyacar.co.uk/cars/new_cars_json.jhtml' + query, true);
             xhr.send();
 
             return xhr;
@@ -140,6 +141,10 @@
 
             if (this.state.filters.filtersSelected[filter] && this.state.filters.filtersSelected[filter][option]) {
                 delete this.state.filters.filtersSelected[filter][option]; // Delete already selected option
+                console.log(Object.keys(this.state.filters.filtersSelected[filter]));
+                if ( Object.keys(this.state.filters.filtersSelected[filter]).length === 0 ) {
+                    delete this.state.filters.filtersSelected[filter];
+                }
             } else if (this.state.filters.filtersSelected[filter]) {
                 this.state.filters.filtersSelected[filter][option] = e.target.innerText; // If filter already has one selected, then add new option
             } else {
@@ -155,7 +160,10 @@
             var data = e.currentTarget.dataset;
 
             delete this.state.filters.filtersSelected[data.filter][data.option];
-
+            
+            if ( Object.keys(this.state.filters.filtersSelected[data.filter]).length === 0 ) {
+                delete this.state.filters.filtersSelected[data.filter];
+            }
             getNewCars();
         }
 
@@ -169,6 +177,8 @@
 
         search = function(e) {
             this.state.filters.searchTerm = (e.currentTarget.value.length > 0) ? e.currentTarget.value : null;
+
+            getNewCars();
         }
 
         // Temp hack to make it look like something is happening
@@ -221,9 +231,11 @@
                 }
             });
             query = query.join('&');
-            console.log(query);
 
-            this.state.cars = shuffle(this.state.cars);
+            // this.state.cars = shuffle(this.state.cars);
+            XHR(displayResults, query);
+
+
         }.bind(this);
 
         this.on('mount', function() {
