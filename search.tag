@@ -76,10 +76,10 @@
       </li>
       <li class="flex-item">
         <div class="results_filter">
-          <select>
-            <option>Most popular</option>
-            <option>Make A-Z</option>
-            <option>Make Z-A</option>
+          <select onchange={ sortOption }>
+            <option value="popular">Most popular</option>
+            <option value="ascending">Make A-Z</option>
+            <option value="descending">Make Z-A</option>
           </select>
         </div>
       </li>
@@ -114,8 +114,9 @@
       filters: {
         carType: null,
         filtersSelected: {},
-        searchTerm: null
-      }
+        searchTerm: null,
+        sort: null
+      },
     };
 
     XHR = function(cb, query) {
@@ -190,6 +191,13 @@
       if ( Object.keys(this.state.filters.filtersSelected[data.filter]).length === 0 ) {
         delete this.state.filters.filtersSelected[data.filter];
       }
+      getNewCars();
+    }
+
+    sortOption = function(e) {
+      e.preventDefault();
+      this.state.filters.sort = e.currentTarget.value;
+
       getNewCars();
     }
 
@@ -293,8 +301,8 @@
             var values = query[key].split(',');
 
             values.forEach(function(v) {
-                filters.filtersSelected[key]    = filters.filtersSelected[key] || {};
-                filters.filtersSelected[key][v] = true;
+              filters.filtersSelected[key]    = filters.filtersSelected[key] || {};
+              filters.filtersSelected[key][v] = true;
             });
           }
         }
