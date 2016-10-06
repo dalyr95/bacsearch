@@ -302,7 +302,9 @@
     });
 
     this.on('mount', function() {
-      XHR(displayResults);
+      console.log(12, window.location.search);
+      var query = (window.location.search.length > 1) ? window.location.search.replace(/^\?/, '') : null;
+      XHR(displayResults, query);
     });
   </script>
 
