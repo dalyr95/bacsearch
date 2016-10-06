@@ -108,6 +108,9 @@
             xhr.open('GET', 'http://dev2.buyacar.co.uk/cars/new_cars_json.jhtml' + query, true);
             xhr.send();
 
+            query = (query.length === 0) ? '?' : query;
+            window.history.pushState({}, '', query);
+
             return xhr;
         }
 
@@ -160,7 +163,7 @@
             var data = e.currentTarget.dataset;
 
             delete this.state.filters.filtersSelected[data.filter][data.option];
-            
+
             if ( Object.keys(this.state.filters.filtersSelected[data.filter]).length === 0 ) {
                 delete this.state.filters.filtersSelected[data.filter];
             }
