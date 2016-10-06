@@ -10,7 +10,7 @@
     </form>
     <h4 class="search_refine">
       Refine your search
-      <button  onclick={ clearSeach }>Clear search</button>
+      <button onclick={ clearSeach }>Clear search</button>
     </h4>
 
     <div class="search_filters">
@@ -119,6 +119,8 @@
       },
     };
 
+    this.originalState = JSON.stringify(this.state);
+
     XHR = function(cb, query) {
       var xhr = new XMLHttpRequest();
       query = (query) ? '?' + query : '';
@@ -134,6 +136,19 @@
 
       return xhr;
     }
+
+    debounce = function(func, wait, immediate) {
+      var timeout;
+      return function() {
+        var context = this, args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+          timeout = null;
+          if (!immediate) func.apply(context, args);
+        }, wait);
+        if (immediate && !timeout) func.apply(context, args);
+      };
+    };
 
     searchSubmit = function(e) {
       console.log('searchSubmit');
@@ -211,16 +226,17 @@
 
     clearSeach = function(e) {
       e.preventDefault();
-      console.log('clear', this.state);
+      this.state.filters = JSON.parse(this.originalState).filters;
+      this.state.filtersOpen = [];
 
       getNewCars();
     }
 
-    search = function(e) {
-      this.state.filters.searchTerm = (e.currentTarget.value.length > 0) ? e.currentTarget.value : null;
+    search = debounce(function(e) {
+      this.state.filters.searchTerm = (e.target.value.length > 0) ? e.target.value : null;
 
       getNewCars();
-    }
+    }, 200);
 
     // Temp hack to make it look like something is happening
     shuffle = function(array) {
