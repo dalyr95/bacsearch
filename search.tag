@@ -190,16 +190,38 @@
             return array;
         }
 
+        serialize = function(obj, prefix) {
+            var str = [];
+            for(var p in obj) {
+                if (obj.hasOwnProperty(p)) {
+                  var k = prefix ? prefix + '[' + p + ']' : p, v = obj[p];
+                  str.push(typeof v == 'object' ?
+                    serialize(v, k) :
+                    encodeURIComponent(k) + '=' + encodeURIComponent(v));
+                }
+            }
+            return str.join("&");
+        }
+
+
+
         getNewCars = function() {
-            console.log('getNewCars', this.state);
             var filters = this.state.filters;
+            var query = [];
 
             Object.keys(filters).forEach(function(key) {
-                console.log(filters[key]);
                 if (filters[key]) {
-                    console.log(1, filters[key]);
+                    if ( typeof filters[key] === 'string' ) {
+                        query.push(key + '=' + encodeURIComponent(filters[key]));
+                    } else {
+                        Object.keys(filters[key]).forEach(function(k) {
+                            query.push(k + '=' + Object.keys(filters[key][k]));
+                        });
+                    }
                 }
             });
+            query = query.join('&');
+            console.log(query);
 
             this.state.cars = shuffle(this.state.cars);
         }.bind(this);
