@@ -91,6 +91,7 @@
           <img src="//images.buyacar.co.uk/img/med/{ value.prodHomeIntImageFileName }" alt={ imgAltString } onload="this.style.opacity = 1;" />
         </span>
         <div class="search_result_content">
+          <span>Used car - { value.inStockDeals === 0 ? 'in stock' : 'out of stock' }</span>
           <h2>{ value.fullName }</h2>
           <p>More info on this car</p>
         </div>
@@ -98,7 +99,7 @@
           { currency }{ value.cheapestAdvertPrice }
           <p>Or from<strong>{ currency }{ parseInt(value.cheapestFinancePaymentAmount, 10) }<sup>*</sup></strong>Per Month</p>
         </div>
-        <a href={ value.prodHomeUrlPath }></a>
+        <a href='http://dev2.buyacar.co.uk/{ value.prodHomeUrlPath }deal_{ value.prodAdvertSeoString }.jhtml'></a>
       </li>
     </ul>
   </div>
@@ -117,6 +118,8 @@
         searchTerm: null,
         sort: null
       },
+      height: 0,
+      pagination: 1
     };
 
     this.originalState = JSON.stringify(this.state);
@@ -162,6 +165,18 @@
       // Hacky shite to shuffle cars
       this.state.cars    = shuffle(this.state.cars);
       this.update();
+
+      this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
+
+    }.bind(this);
+
+    appendResults = function(data) {
+      this.state.loading = false;
+      this.state.cars    = this.state.cars.concat(data);
+
+      this.update();
+
+      this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
 
     }.bind(this);
 
@@ -289,9 +304,11 @@
           }
         }
       });
+      if ( this.state.pagination > 1 ) {
+        query.push('page=' + this.state.pagination);
+      }
       query = query.join('&');
 
-      // this.state.cars = shuffle(this.state.cars);
       XHR(displayResults, query);
 
     }.bind(this);
@@ -339,7 +356,16 @@
       }.bind(this);
 
       XHR(displayResults, query);
+
+      document.addEventListener('scroll', debounce(function() {
+        // find when we are the bottom of the page
+        if ( (window.pageYOffset) > (this.state.height - window.innerHeight) ) {
+          this.state.pagination++;
+          XHR(appendResults, window.history.search);
+        }
+      },200).bind(this));
     });
+
   </script>
 
   <style scoped>
