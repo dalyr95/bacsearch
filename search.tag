@@ -122,6 +122,7 @@
     this.originalState = JSON.stringify(this.state);
 
     XHR = function(cb, query) {
+      this.state.loading = true;
       var xhr = new XMLHttpRequest();
       query = (query) ? '?' + query : '';
       xhr.addEventListener('load', function(data) {
@@ -132,10 +133,11 @@
 
       query = (query.length === 0) ? '?' : query;
 
-      window.history.pushState({}, '', query);
+      window.history.pushState(this.state.filters, '', query);
+      console.log(this.state.filters);
 
       return xhr;
-    }
+    }.bind(this);
 
     debounce = function(func, wait, immediate) {
       var timeout;
@@ -157,7 +159,10 @@
     displayResults = function(data) {
       this.state.loading = false;
       this.state.cars    = data;
+      // Hacky shite to shuffle cars
+      this.state.cars    = shuffle(this.state.cars);
       this.update();
+
     }.bind(this);
 
     filters = function(e) {
@@ -326,6 +331,13 @@
 
     this.on('mount', function() {
       var query = (window.location.search.length > 1) ? window.location.search.replace(/^\?/, '') : null;
+
+      window.onpopstate = function(event) {
+        console.log("location: " + document.location + ", state: " + JSON.stringify(event));
+        this.state.filters = window.history.state;
+        this.update();
+      }.bind(this);
+
       XHR(displayResults, query);
     });
   </script>
