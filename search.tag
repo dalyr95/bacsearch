@@ -69,9 +69,6 @@
 
     <ul class="flex-container">
       <li class="flex-item">
-        <button>Compare</button>
-      </li>
-      <li class="flex-item">
         <div class="results_total">1703 Results</div>
       </li>
       <li class="flex-item">
