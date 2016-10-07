@@ -1,0 +1,23 @@
+{
+  "name": "buy-a-car-search",
+  "version": "1.0.0",
+  "description": "Search section of the site",
+  "main": "search.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "lite-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dalyr95/bacsearch.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dalyr95/bacsearch/issues"
+  },
+  "homepage": "https://github.com/dalyr95/bacsearch#readme",
+  "devDependencies": {
+    "lite-server": "^2.2.2"
+  }
+}
