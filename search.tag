@@ -86,7 +86,7 @@
     </ul>
 
     <ul>
-      <li each={ value, key in state.cars } class="search_result" style="animation-delay: {key * 100 + 150}ms;">
+      <li each={ value, key in state.cars } class="search_result" style="animation-delay: { state.appending === true ? 0 : key * 100 + 150}ms;">
         <span class="search_result_image">
           <img src="//images.buyacar.co.uk/img/med/{ value.prodHomeIntImageFileName }" alt={ imgAltString } onload="this.style.opacity = 1;" />
         </span>
@@ -119,7 +119,8 @@
         sort: null
       },
       height: 0,
-      pagination: 1
+      pagination: 1,
+      appending: false
     };
 
     this.originalState = JSON.stringify(this.state);
@@ -164,6 +165,7 @@
       this.state.cars    = data;
       // Hacky shite to shuffle cars
       this.state.cars    = shuffle(this.state.cars);
+
       this.update();
 
       this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
@@ -175,6 +177,8 @@
       this.state.cars    = this.state.cars.concat(data);
 
       this.update();
+
+      this.state.appending = false;
 
       this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
 
@@ -361,6 +365,7 @@
         // find when we are the bottom of the page
         if ( (window.pageYOffset) > (this.state.height - window.innerHeight) ) {
           this.state.pagination++;
+          this.state.appending = true;
           XHR(appendResults, window.history.search);
         }
       },200).bind(this));
