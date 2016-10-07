@@ -362,11 +362,13 @@
       XHR(displayResults, query);
 
       document.addEventListener('scroll', debounce(function() {
-        // find when we are the bottom of the page
-        if ( (window.pageYOffset) > (this.state.height - window.innerHeight) ) {
-          this.state.pagination++;
-          this.state.appending = true;
-          XHR(appendResults, window.history.search);
+        if ( this.state.appending === false ) {
+          // find when we are the bottom of the page
+          if ( (window.pageYOffset) > (this.state.height - window.innerHeight) ) {
+            this.state.pagination++;
+            this.state.appending = true;
+            XHR(appendResults, window.history.search);
+          }
         }
       },200).bind(this));
     });
