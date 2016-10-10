@@ -6,7 +6,7 @@
   <div class="search_sidebar">
     <form class="search_form" onsubmit={ searchSubmit }>
       <input type="text" name="search-cars" value={ state.filters.searchTerm } onkeyup={ search }/>
-      <button>Search</button>
+      <button class="btn btn_btn_standard" onclick={ search }>Search</button>
     </form>
     <h4 class="search_refine">
       Refine your search
@@ -265,7 +265,9 @@
     }
 
     search = debounce(function(e) {
-      this.state.filters.searchTerm = (e.target.value.length > 0) ? e.target.value : null;
+      if ( e.target.tagName === 'INPUT') {
+        this.state.filters.searchTerm = (e.target.value.length > 0) ? e.target.value : null;
+      }
 
       getNewCars();
     }, 200);
