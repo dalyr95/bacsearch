@@ -65,7 +65,7 @@
     </div>
   </div>
 
-  <div class="search_results {state.loading === true ? 'loading' : ''}{state.appending === true ? 'appending' : ''}">
+  <div class="search_results {state.loading === true ? 'loading' : ''} { state.appending === true ? 'appending' : '' }">
     <ul class="flex-container">
       <li class="flex-item">
         <div class="results_total">1703 Results</div>
@@ -82,7 +82,7 @@
     </ul>
 
     <ul>
-      <li each={ value, key in state.cars } class="search_result" style="animation-delay: { state.appending === true ? 0 : key * 100 + 150}ms;">
+      <li each={ value, key in state.cars } class="search_result" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;">
         <span class="search_result_image">
           <img src="//images.buyacar.co.uk/img/med/{ value.prodHomeIntImageFileName }" alt={ imgAltString } onload="this.style.opacity = 1;" />
         </span>
@@ -107,6 +107,7 @@
 
     this.state = {
       loading: true,
+      appending: false,
       cars: null,
       filtersOpen: [],
       filters: {
@@ -117,7 +118,7 @@
       },
       height: 0,
       pagination: 1,
-      appending: false
+      disableAnimations: false
     };
 
     this.originalState = JSON.stringify(this.state);
@@ -172,12 +173,13 @@
     }.bind(this);
 
     appendResults = function(data) {
-      this.state.loading = false;
-      this.state.cars    = this.state.cars.concat(data);
+      this.state.loading   = false;
+      this.state.appending = false;
+      this.state.cars      = this.state.cars.concat(data);
 
       this.update();
 
-      this.state.appending = false;
+      this.state.disableAnimations = false;
 
       this.one('updated', function() {
         this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
@@ -373,7 +375,11 @@
           // find when we are the bottom of the page
           if ( (window.pageYOffset) > (this.state.height - window.innerHeight) ) {
             this.state.pagination++;
+            this.state.loading = true;
             this.state.appending = true;
+            this.state.disableAnimations = true;
+
+            this.update();
 
             XHR(appendResults, window.location.search.replace(/^\?/, ''));
 
@@ -398,11 +404,16 @@
       display: block;
       margin: 0 auto;
       min-height: calc(100vh + 1px);
-      max-width: 1160px;
+      /*max-width: 1160px;*/
       overflow: hidden;
       width: 100%;
     }
-
+    .header {
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+      /*position: fixed;*/
+    }
     .flex-container {
       padding: 0;
       margin: 0;
@@ -421,11 +432,23 @@
       font-size: 1.5em;
       text-align: center;
     }
-
-    .search_sidebar {
-      position: fixed;
-      width: 50%;
-      padding: 0 10px;
+    .search_sidebar,
+    .search_results {
+      width: 100%;
+    }
+    @media only screen and (min-width: 500px) {
+      .search_sidebar {
+        position: fixed;
+        width: 50%;
+        padding: 0 10px;
+      }
+      .search_results {
+        float: right;
+        min-height: 600px;
+        position: relative;
+        width: 50%;
+        padding: 0 10px 100px 10px;
+      }
     }
 
     .search_filters_dropdowns {
@@ -652,13 +675,6 @@
       background-color: #FFF;
     }
 
-    .search_results {
-      float: right;
-      min-height: 600px;
-      position: relative;
-      width: 50%;
-      padding: 0 10px 100px 10px;
-    }
 
     .search_results.loading::before {
       content: '';
@@ -682,6 +698,22 @@
       transform: translateY(-50%);
       width: 476px;
       z-index: 2;
+    }
+    .search_results.appending::after {
+      content: '';
+      position: absolute;
+      bottom: 70px;
+      left: 0;
+      right: 0;
+      margin: auto;
+      border-radius: 50%;
+      border-top: 3px solid black;
+      border-left: 3px solid black;
+      width: 40px;
+      height: 40px;
+      animation-name: appending;
+      animation-iteration-count: infinite;
+      animation-duration: 0.5s;
     }
 
     .search_results .search_result {
@@ -710,6 +742,14 @@
       to {
         transform: translateX(0);
         opacity: 1;
+      }
+    }
+    @keyframes appending {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
       }
     }
 
