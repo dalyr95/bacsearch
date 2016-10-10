@@ -167,7 +167,6 @@
 
       this.one('updated', function() {
         this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
-        console.log(this.state.height);
       });
 
     }.bind(this);
@@ -182,7 +181,6 @@
 
       this.one('updated', function() {
         this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
-        console.log(this.state.height);
       });
 
     }.bind(this);
@@ -425,14 +423,15 @@
     }
 
     .search_sidebar {
-      float: left;
       position: fixed;
-      width: 384px;
+      width: 50%;
+      padding: 0 10px;
     }
 
     .search_filters_dropdowns {
       overflow-y: scroll;
       max-height: calc(100vh - 180px);
+      width: 100%;
     }
 
     .search_sidebar .search_form input {
@@ -653,14 +652,12 @@
       background-color: #FFF;
     }
 
-
-
     .search_results {
       float: right;
       min-height: 600px;
       position: relative;
-      width: calc(100% - 384px - 60px);
-      padding-bottom: 100px;
+      width: 50%;
+      padding: 0 10px 100px 10px;
     }
 
     .search_results.loading::before {
@@ -675,7 +672,7 @@
     }
 
     .search_results.loading::after {
-      background-color: #fff; 
+      background-color: #fff;
       border-radius: 4px;
       content: 'Processing results...';
       padding: 10px;
