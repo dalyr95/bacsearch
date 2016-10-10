@@ -98,7 +98,7 @@
         <a href='http://dev2.buyacar.co.uk/{ value.prodHomeUrlPath }deal_{ value.prodAdvertSeoString }.jhtml'></a>
       </li>
     </ul>
-    <button if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
+    <button class="load-more" if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
   </div>
 
   <script>
@@ -584,6 +584,15 @@
       margin: auto;
       transform: rotate(45deg);
       transition: transform 0.05s linear;
+    }
+    .load-more {
+      width: 100%;
+      background-color: #ff8100;
+      padding: 10px;
+      border: 0;
+      color: #FFF;
+      cursor: pointer;
+      font-size: 1.2em;
     }
 
     .search_sidebar .search_filters_dropdowns .open h6::after {
