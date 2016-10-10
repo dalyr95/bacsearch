@@ -346,14 +346,14 @@
 
       Object.keys(query).forEach(function( key ) {
         if ( filters.hasOwnProperty(key) ) {
-          filters[key] = query[key];
+          filters[key] = decodeURIComponent(query[key]);
         } else {
           if (query[key]) {
             var values = query[key].split(',');
 
             values.forEach(function(v) {
               filters.filtersSelected[key]    = filters.filtersSelected[key] || {};
-              filters.filtersSelected[key][v] = true;
+              filters.filtersSelected[key][v] = decodeURIComponent(true);
             });
           }
         }
