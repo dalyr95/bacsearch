@@ -660,6 +660,7 @@
       min-height: 600px;
       position: relative;
       width: calc(100% - 384px - 60px);
+      padding-bottom: 100px;
     }
 
     .search_results.loading::before {
