@@ -24,7 +24,6 @@
       </div>
 
       <div class="search_filters_dropdowns">
-
         <div class={ (state.filtersOpen.indexOf('make') > -1) ? 'open' : '' }>
           <h6 data-filter="make" onclick={ filters }>Make</h6>
           <div class="search_filters_selected">
@@ -62,10 +61,11 @@
         </div>
 
       </div>
+
     </div>
   </div>
 
-  <div class="search_results {state.loading === true ? 'loading' : ''}">
+  <div class="search_results {state.loading === true ? 'loading' : ''}{state.appending === true ? 'appending' : ''}">
     <ul class="flex-container">
       <li class="flex-item">
         <div class="results_total">1703 Results</div>
@@ -91,9 +91,9 @@
           <h2>{ value.fullName }</h2>
           <p>More info on this car</p>
         </div>
-        <div class="search_result_price">
+        <div class="search_result_price" if={ value.cheapestAdvertPrice }>
           { currency }{ value.cheapestAdvertPrice }
-          <p>Or from<strong>{ currency }{ parseInt(value.cheapestFinancePaymentAmount, 10) }<sup>*</sup></strong>Per Month</p>
+          <p if={ value.cheapestFinancePaymentAmount }>Or from<strong>{ currency }{ parseInt(value.cheapestFinancePaymentAmount, 10) }<sup>*</sup></strong>Per Month</p>
         </div>
         <a href='http://dev2.buyacar.co.uk/{ value.prodHomeUrlPath }deal_{ value.prodAdvertSeoString }.jhtml'></a>
       </li>
