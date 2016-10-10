@@ -10,10 +10,11 @@
     </form>
     <h4 class="search_refine">
       Refine your search
-      <button onclick={ clearSeach }>Clear search</button>
+      <button class="btn btn_standard" onclick={ clearSeach }>Clear search</button>
     </h4>
 
     <div class="search_filters">
+
       <div class="search_filter_show">
         Show:
         <ul>
@@ -98,7 +99,7 @@
         <a href='http://dev2.buyacar.co.uk/{ value.prodHomeUrlPath }deal_{ value.prodAdvertSeoString }.jhtml'></a>
       </li>
     </ul>
-    <button class="load-more" if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
+    <button class="btn btn_standard btn_load_more" if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
   </div>
 
   <script>
@@ -587,13 +588,15 @@
       transform: rotate(45deg);
       transition: transform 0.05s linear;
     }
-    .load-more {
+    .btn {
+      cursor: pointer;
+    }
+    .btn_load_more {
       width: 100%;
       background-color: #ff8100;
       padding: 10px;
       border: 0;
       color: #FFF;
-      cursor: pointer;
       font-size: 1.2em;
     }
 
@@ -611,7 +614,6 @@
     }
 
     .search_sidebar .search_filters_dropdowns .search_filters_options li {
-      cursor: pointer;
       padding: 2px 5px;
     }
 
