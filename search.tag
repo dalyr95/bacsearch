@@ -428,6 +428,11 @@
       width: 384px;
     }
 
+    .search_filters_dropdowns {
+      overflow-y: scroll;
+      max-height: calc(100vh - 180px);
+    }
+
     .search_sidebar .search_form input {
       border-radius: 4px;
       border:  1px solid #d9d9d9;
