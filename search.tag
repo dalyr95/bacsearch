@@ -1,8 +1,8 @@
 <search>
+
   <header class="header">
     <h1>Search New &amp; Used Cars for Sale</h1>
   </header>
-
   <div class="search_sidebar">
     <form class="search_form" onsubmit={ searchSubmit }>
       <input type="text" name="search-cars" value={ state.filters.searchTerm } onkeyup={ search }/>
@@ -66,7 +66,6 @@
   </div>
 
   <div class="search_results {state.loading === true ? 'loading' : ''}">
-
     <ul class="flex-container">
       <li class="flex-item">
         <div class="results_total">1703 Results</div>
@@ -99,6 +98,7 @@
         <a href='http://dev2.buyacar.co.uk/{ value.prodHomeUrlPath }deal_{ value.prodAdvertSeoString }.jhtml'></a>
       </li>
     </ul>
+    <button if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
   </div>
 
   <script>
@@ -165,7 +165,10 @@
 
       this.update();
 
-      this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
+      this.one('updated', function() {
+        this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
+        console.log(this.state.height);
+      });
 
     }.bind(this);
 
@@ -177,7 +180,10 @@
 
       this.state.appending = false;
 
-      this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
+      this.one('updated', function() {
+        this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
+        console.log(this.state.height);
+      });
 
     }.bind(this);
 
@@ -248,8 +254,12 @@
       e.preventDefault();
       this.state.filters = JSON.parse(this.originalState).filters;
       this.state.filtersOpen = [];
+      this.state.pagination = 1;
 
       getNewCars();
+      document.addEventListener('scroll', this.scroll);
+
+      window.scrollTo(0, 0);
     }
 
     search = debounce(function(e) {
@@ -357,8 +367,8 @@
       }.bind(this);
 
       XHR(displayResults, query);
-
-      document.addEventListener('scroll', debounce(function() {
+      this.scroll = debounce(function() {
+        console.log('scroll', this.state.pagination);
         if ( this.state.appending === false ) {
           // find when we are the bottom of the page
           if ( (window.pageYOffset) > (this.state.height - window.innerHeight) ) {
@@ -366,9 +376,14 @@
             this.state.appending = true;
 
             XHR(appendResults, window.location.search.replace(/^\?/, ''));
+
+            if ( this.state.pagination > 3 ) {
+              document.removeEventListener('scroll', this.scroll);
+            }
           }
         }
-      },200).bind(this));
+      },200).bind(this)
+      document.addEventListener('scroll', this.scroll);
     });
 
   </script>
@@ -409,6 +424,7 @@
 
     .search_sidebar {
       float: left;
+      position: fixed;
       width: 384px;
     }
 
