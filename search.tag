@@ -369,6 +369,7 @@
       }.bind(this);
 
       XHR(displayResults, query);
+
       this.scroll = debounce(function() {
         if ( this.state.appending === false ) {
           // find when we are the bottom of the page
