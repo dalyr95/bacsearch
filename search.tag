@@ -647,15 +647,20 @@
       top: 0;
       width: 100%;
       height: 100%;
+      z-index: 1;
     }
 
     .search_results.loading::after {
+      background-color: #fff; 
+      border-radius: 4px;
       content: 'Processing results...';
+      padding: 10px;
       position: fixed;
       top: 50%;
       text-align: center;
       transform: translateY(-50%);
       width: 476px;
+      z-index: 2;
     }
 
     .search_results .search_result {
