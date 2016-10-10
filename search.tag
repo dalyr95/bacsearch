@@ -364,7 +364,8 @@
           if ( (window.pageYOffset) > (this.state.height - window.innerHeight) ) {
             this.state.pagination++;
             this.state.appending = true;
-            XHR(appendResults, window.history.search);
+
+            XHR(appendResults, window.location.search.replace(/^\?/, ''));
           }
         }
       },200).bind(this));
