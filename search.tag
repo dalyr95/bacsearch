@@ -220,6 +220,8 @@
         this.state.filters.filtersSelected[filter][option] = e.target.innerText;
       }
 
+      window.scrollTo(0, 0);
+
       getNewCars();
     }
 
