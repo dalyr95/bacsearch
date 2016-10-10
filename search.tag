@@ -436,7 +436,7 @@
     .search_results {
       width: 100%;
     }
-    @media only screen and (min-width: 500px) {
+    @media only screen and (min-width: 720px) {
       .search_sidebar {
         position: fixed;
         width: 50%;
