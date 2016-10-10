@@ -136,7 +136,6 @@
       query = (query.length === 0) ? '?' : query;
 
       window.history.pushState(this.state.filters, '', query);
-      console.log(this.state.filters);
 
       return xhr;
     }.bind(this);
@@ -156,7 +155,7 @@
 
     searchSubmit = function(e) {
       e.preventDefault();
-    }
+    };
 
     displayResults = function(data) {
       this.state.loading = false;
@@ -220,10 +219,13 @@
         this.state.filters.filtersSelected[filter][option] = e.target.innerText;
       }
 
-      window.scrollTo(0, 0);
-
       getNewCars();
     }
+
+    resetResults = function() {
+      window.scrollTo(0, 0);
+      this.state.pagination = 1;
+    }.bind(this);
 
     removeFilter = function(e) {
       e.preventDefault();
@@ -256,12 +258,10 @@
       e.preventDefault();
       this.state.filters = JSON.parse(this.originalState).filters;
       this.state.filtersOpen = [];
-      this.state.pagination = 1;
 
       getNewCars();
-      document.addEventListener('scroll', this.scroll);
 
-      window.scrollTo(0, 0);
+      document.addEventListener('scroll', this.scroll);
     }
 
     search = debounce(function(e) {
@@ -322,6 +322,7 @@
       }
       query = query.join('&');
 
+      resetResults();
       XHR(displayResults, query);
 
     }.bind(this);
@@ -340,8 +341,8 @@
 
     this.on('before-mount', function() {
       var query   = window.location.search.replace(/^\?/, '');
-      query       = parseQueryString(query);
       var filters = this.state.filters;
+      query       = parseQueryString(query);
 
       Object.keys(query).forEach(function( key ) {
         if ( filters.hasOwnProperty(key) ) {
@@ -363,14 +364,12 @@
       var query = (window.location.search.length > 1) ? window.location.search.replace(/^\?/, '') : null;
 
       window.onpopstate = function(event) {
-        console.log("location: " + document.location + ", state: " + JSON.stringify(event));
         this.state.filters = window.history.state;
         this.update();
       }.bind(this);
 
       XHR(displayResults, query);
       this.scroll = debounce(function() {
-        console.log('scroll', this.state.pagination);
         if ( this.state.appending === false ) {
           // find when we are the bottom of the page
           if ( (window.pageYOffset) > (this.state.height - window.innerHeight) ) {
