@@ -25,7 +25,7 @@
       </div>
 
       <div class="search_filters_dropdowns">
-        <div class={ (state.filtersOpen.indexOf('make') > -1) ? 'open' : '' }>
+        <div class={ (state.filtersOpen['make']) ? 'open' : '' }>
           <h6 data-filter="make" onclick={ filters }>Make</h6>
           <div class="search_filters_selected">
             <ul>
@@ -34,7 +34,7 @@
               </li>
             </ul>
           </div>
-          <ul class="search_filters_options" onclick={ filterOption }>
+          <ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['make']) ? state.filtersOpen['make'] : '0' }px">
             <li data-option="make-1" class={ selected : state.filters.filtersSelected.make['make-1'] }>Make 1</li>
             <li data-option="make-2" class={ selected : state.filters.filtersSelected.make['make-2'] }>Make 2</li>
             <li data-option="make-3" class={ selected : state.filters.filtersSelected.make['make-3'] }>Make 3</li>
@@ -43,7 +43,7 @@
           </ul>
         </div>
 
-        <div class={ (state.filtersOpen.indexOf('model') > -1) ? 'open' : '' }>
+        <div class={ (state.filtersOpen['model']) ? 'open' : '' }>
           <h6 data-filter="model" onclick={ filters }>Model</h6>
           <div class="search_filters_selected">
             <ul>
@@ -52,12 +52,28 @@
               </li>
             </ul>
           </div>
-          <ul class="search_filters_options" onclick={ filterOption }>
+          <ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? state.filtersOpen['model'] : '0' }px">
             <li data-option="model-1" class={ selected : state.filters.filtersSelected.model['model-1'] }>Model 1</li>
             <li data-option="model-2" class={ selected : state.filters.filtersSelected.model['model-2'] }>Model 2</li>
             <li data-option="model-3" class={ selected : state.filters.filtersSelected.model['model-3'] }>Model 3</li>
             <li data-option="model-4" class={ selected : state.filters.filtersSelected.model['model-4'] }>Model 4</li>
             <li data-option="model-5" class={ selected : state.filters.filtersSelected.model['model-5'] }>Model 5</li>
+          </ul>
+        </div>
+
+        <div class={ (state.filtersOpen['price']) ? 'open' : '' }>
+          <h6 data-filter="price" onclick={ filters }>Price</h6>
+          <div class="search_filters_selected">
+            <ul>
+              <li each={ key, value in state.filters.filtersSelected.price } data-filter="price" data-option={ key } onClick={ removeFilter }>
+                <span>{ value }</span>
+              </li>
+            </ul>
+          </div>
+          <ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['price']) ? state.filtersOpen['price'] : '0' }px">
+            <li data-option="price-1" class={ selected : state.filters.filtersSelected.price['price-1'] }>Price 1</li>
+            <li data-option="price-2" class={ selected : state.filters.filtersSelected.price['price-2'] }>Price 2</li>
+            <li data-option="price-3" class={ selected : state.filters.filtersSelected.price['price-3'] }>Price 3</li>
           </ul>
         </div>
 
@@ -110,7 +126,7 @@
       loading: true,
       appending: false,
       cars: null,
-      filtersOpen: [],
+      filtersOpen: {},
       filters: {
         carType: null,
         filtersSelected: {},
@@ -191,12 +207,11 @@
       e.preventDefault();
 
       var filter  = e.currentTarget.dataset.filter;
-      var index   = this.state.filtersOpen.indexOf(filter);
 
-      if (index === -1) {
-        this.state.filtersOpen.push(filter);
+      if (this.state.filtersOpen[filter]) {
+        delete this.state.filtersOpen[filter];
       } else {
-        this.state.filtersOpen.splice(index, 1);
+        this.state.filtersOpen[filter] = e.currentTarget.dataset.height;
       }
     }
 
@@ -258,7 +273,7 @@
     clearSeach = function(e) {
       e.preventDefault();
       this.state.filters = JSON.parse(this.originalState).filters;
-      this.state.filtersOpen = [];
+      this.state.filtersOpen = {};
 
       getNewCars();
 
@@ -378,9 +393,9 @@
           // find when we are the bottom of the page
           if ( (window.pageYOffset) > (this.state.height - window.innerHeight) ) {
             this.state.pagination++;
-            this.state.loading = true;
-            this.state.appending = true;
-            this.state.disableAnimations = true;
+            this.state.loading              = true;
+            this.state.appending            = true;
+            this.state.disableAnimations    = true;
 
             this.update();
 
@@ -393,6 +408,15 @@
         }
       },200).bind(this)
       document.addEventListener('scroll', this.scroll);
+    });
+
+    this.on('updated', function() {
+        var filters = [].slice.call(this.root.getElementsByClassName('search_filters_options'));
+        var height  = filters[0].children[0].getBoundingClientRect().height;
+
+        filters.forEach(function(f) {
+            f.previousElementSibling.previousElementSibling.dataset.height = f.children.length * height;
+        });
     });
 
   </script>
@@ -607,6 +631,7 @@
     .search_sidebar .search_filters_dropdowns .search_filters_options {
       overflow: hidden;
       height: 0;
+      transition: height 0.1s linear;
     }
 
     .search_sidebar .search_filters_dropdowns .open .search_filters_options {
@@ -614,6 +639,7 @@
     }
 
     .search_sidebar .search_filters_dropdowns .search_filters_options li {
+      cursor: pointer;
       padding: 2px 5px;
     }
 
