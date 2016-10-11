@@ -6,14 +6,15 @@
   <div class="search_sidebar">
     <form class="search_form" onsubmit={ searchSubmit }>
       <input type="text" name="search-cars" value={ state.filters.searchTerm } onkeyup={ search }/>
-      <button>Search</button>
+      <button class="btn btn_btn_standard" onclick={ search }>Search</button>
     </form>
     <h4 class="search_refine">
       Refine your search
-      <button onclick={ clearSeach }>Clear search</button>
+      <button class="btn btn_standard" onclick={ clearSeach }>Clear search</button>
     </h4>
 
     <div class="search_filters">
+
       <div class="search_filter_show">
         Show:
         <ul>
@@ -98,7 +99,7 @@
         <a href='http://dev2.buyacar.co.uk/{ value.prodHomeUrlPath }deal_{ value.prodAdvertSeoString }.jhtml'></a>
       </li>
     </ul>
-    <button if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
+    <button class="btn btn_standard btn_load_more" if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
   </div>
 
   <script>
@@ -265,7 +266,9 @@
     }
 
     search = debounce(function(e) {
-      this.state.filters.searchTerm = (e.target.value.length > 0) ? e.target.value : null;
+      if ( e.target.tagName === 'INPUT') {
+        this.state.filters.searchTerm = (e.target.value.length > 0) ? e.target.value : null;
+      }
 
       getNewCars();
     }, 200);
@@ -585,6 +588,17 @@
       transform: rotate(45deg);
       transition: transform 0.05s linear;
     }
+    .btn {
+      cursor: pointer;
+    }
+    .btn_load_more {
+      width: 100%;
+      background-color: #ff8100;
+      padding: 10px;
+      border: 0;
+      color: #FFF;
+      font-size: 1.2em;
+    }
 
     .search_sidebar .search_filters_dropdowns .open h6::after {
       transform: rotate(135deg);
@@ -600,7 +614,6 @@
     }
 
     .search_sidebar .search_filters_dropdowns .search_filters_options li {
-      cursor: pointer;
       padding: 2px 5px;
     }
 
