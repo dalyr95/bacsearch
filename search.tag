@@ -147,7 +147,7 @@
 
 		this.originalState = JSON.stringify(this.state);
 
-		XHR = function(cb, query) {
+		XHR = function(cb, query, nopopstate) {
 			this.state.loading = true;
 
 			var xhr = new XMLHttpRequest();
@@ -162,7 +162,9 @@
 
 			query = (query.length === 0) ? '?' : query;
 
-			window.history.pushState(this.state.filters, '', query);
+			if ( nopopstate !== true ) {
+				window.history.pushState(this.state.filters, '', query);
+			}
 
 			return xhr;
 		}.bind(this);
@@ -334,7 +336,7 @@
 			return str.join("&");
 		}
 
-		getNewCars = function() {
+		getNewCars = function(nopopstate) {
 			var filters = this.state.filters;
 			var query = [];
 
@@ -355,7 +357,7 @@
 			query = query.join('&');
 
 			resetResults();
-			XHR(displayResults, query);
+			XHR(displayResults, query, nopopstate);
 
 		}.bind(this);
 
@@ -408,6 +410,8 @@
 			window.onpopstate = function(event) {
 				this.state.filters = window.history.state;
 				this.update();
+				
+				getNewCars(true);
 			}.bind(this);
 
 
