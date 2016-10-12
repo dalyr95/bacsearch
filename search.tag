@@ -5,7 +5,10 @@
   </header>
   <div class="search_sidebar">
     <form class="search_form" onsubmit={ searchSubmit }>
-      <input type="text" name="search-cars" value={ state.filters.searchTerm } onkeyup={ search }/>
+      <input type="text" id="search-search" name="search-cars" value={ state.filters.searchTerm } onkeyup={ search } list="search-cars"/>
+        <datalist id="search-cars">
+            <option each={ name, i in state.datalist } value={name}>
+        </datalist>
       <button class="btn btn_btn_standard" onclick={ search }>Search</button>
     </form>
     <h4 class="search_refine">
@@ -142,11 +145,14 @@
 
     XHR = function(cb, query) {
       this.state.loading = true;
+
       var xhr = new XMLHttpRequest();
       query = (query) ? '?' + query : '';
+
       xhr.addEventListener('load', function(data) {
         cb(JSON.parse(data.currentTarget.responseText));
       });
+
       xhr.open('GET', 'http://dev2.buyacar.co.uk/cars/new_cars_json.jhtml' + query, true);
       xhr.send();
 
@@ -281,11 +287,15 @@
     }
 
     search = debounce(function(e) {
-      if ( e.target.tagName === 'INPUT') {
+      if ( e.target.tagName === 'INPUT' && e.keyCode === 13) {
         this.state.filters.searchTerm = (e.target.value.length > 0) ? e.target.value : null;
-      }
 
-      getNewCars();
+        getNewCars();
+      } else if ( e.type !== 'keyup') {
+        this.state.filters.searchTerm = e.target.parentNode.firstElementChild.value;
+
+        getNewCars();
+      }
     }, 200);
 
     // Temp hack to make it look like something is happening
@@ -379,14 +389,26 @@
     });
 
     this.on('mount', function() {
+
+      // Get initial results
+      // -----------------------------------------------------------
+
       var query = (window.location.search.length > 1) ? window.location.search.replace(/^\?/, '') : null;
+
+      XHR(displayResults, query);
+
+
+      // Popstate (back button)
+      // -----------------------------------------------------------
 
       window.onpopstate = function(event) {
         this.state.filters = window.history.state;
         this.update();
       }.bind(this);
 
-      XHR(displayResults, query);
+
+      // Infinite load
+      // -----------------------------------------------------------
 
       this.scroll = debounce(function() {
         if ( this.state.appending === false ) {
@@ -406,8 +428,33 @@
             }
           }
         }
-      },200).bind(this)
+      },200).bind(this);
+
       document.addEventListener('scroll', this.scroll);
+
+
+      // Populate Datalist
+      // -----------------------------------------------------------
+
+      var xhr = new XMLHttpRequest();
+
+      xhr.addEventListener('load', function(data) {
+        console.log(JSON.parse(data.currentTarget.responseText));
+        var carsRepsonse = JSON.parse(data.currentTarget.responseText);
+
+          var datalist = [];
+          carsRepsonse.makes.forEach(function(make) {
+            datalist.push(make.name);
+            make.models.forEach(function(model) {
+                datalist.push(make.name + ' ' + model.name);
+            });
+          });
+
+          this.state.datalist = datalist;
+      }.bind(this));
+
+      xhr.open('GET', '/cars.json', true);
+      xhr.send();
     });
 
     this.on('updated', function() {
@@ -508,6 +555,11 @@
       height: 40px;
       width: 120px;
       -webkit-appearance: none;
+    }
+
+    .search_sidebar .search_form button:active {
+        background-color: #ff8100;
+        color: #fff;
     }
 
     .search_sidebar .search_refine {
