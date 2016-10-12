@@ -85,7 +85,7 @@
 		</div>
 	</div>
 
-	<div class="search_results {state.loading === true ? 'loading' : ''} { state.appending === true ? 'appending' : '' }">
+	<div <div if={ state.cars.length > 0 } class="search_results {state.loading === true ? 'loading' : ''} { state.appending === true ? 'appending' : '' }">
 		<ul class="flex-container">
 			<li class="flex-item">
 				<div class="results_total">1703 Results</div>
@@ -121,6 +121,10 @@
 		<button class="btn btn_standard btn_load_more" if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
 	</div>
 
+	<div if={ state.loading === false && state.cars.length === 0 } class="search_results no_results">
+		No cars found
+	</div>
+
 	<script>
 		window.tag = this;
 		this.currency   = '£';
@@ -128,7 +132,7 @@
 		this.state = {
 			loading: true,
 			appending: false,
-			cars: null,
+			cars: [],
 			filtersOpen: {},
 			filters: {
 				carType: null,
