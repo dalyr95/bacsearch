@@ -122,7 +122,9 @@
 	</div>
 
 	<div if={ state.loading === false && state.cars.length === 0 } class="search_results no_results">
-		No cars found
+        No cars found
+        <button if={ (filtersExist() === true) } onclick={ goBack }>Remove last filter</button>
+        <button if={ (filtersExist() === true) } onclick={ clearSeach }>Clear search</button>
 	</div>
 
 	<script>
@@ -360,6 +362,30 @@
 			XHR(displayResults, query, nopopstate);
 
 		}.bind(this);
+
+        goBack = function() {
+            window.history.back();
+        }
+
+        this.filtersExist = function() {
+            var hasFilters  = false;
+            var filters     = this.state.filters;
+
+            var keys = Object.keys(filters);
+
+            keys.forEach(function(key) {
+                if (filters[key]) {
+                    if (typeof filters[key] === 'object') {
+                        if (Object.keys(filters[key]).length > 0) { hasFilters = true; }
+                    } else {
+                        hasFilters = true;
+                    }
+                }
+            });
+
+
+            return hasFilters;
+        }
 
 		var parseQueryString = function( queryString ) {
 			var params = {}, queries, temp, i, l;
