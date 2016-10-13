@@ -11,10 +11,10 @@
 				</datalist>
 			<button class="btn btn_btn_standard" onclick={ search }>Search</button>
 		</form>
-		<h4 class="search_refine">
+		<h6 class="search_refine">
 			Refine your search
-			<button class="btn btn_standard" onclick={ clearSeach }>Clear search</button>
-		</h4>
+			<a href="#" onclick={ clearSeach }>Clear search</a>
+		</h6>
 
 		<div class="search_filters">
 
@@ -86,11 +86,11 @@
 	</div>
 
 	<div <div if={ state.cars.length > 0 } class="search_results {state.loading === true ? 'loading' : ''} { state.appending === true ? 'appending' : '' }">
-		<ul class="flex-container">
-			<li class="flex-item">
+		<ul>
+			<li>
 				<div class="results_total">1703 Results</div>
 			</li>
-			<li class="flex-item">
+			<li>
 				<div class="results_filter">
 					<select onchange={ sortOption }>
 						<option value="popular">Most popular</option>
@@ -108,7 +108,7 @@
 				</span>
 				<div class="search_result_content">
 					<span>Used car - { value.inStockDeals === 0 ? 'in stock' : 'out of stock' }</span>
-					<h2>{ value.fullName }</h2>
+					<h4>{ value.fullName }</h4>
 					<p>More info on this car</p>
 				</div>
 				<div class="search_result_price" if={ value.cheapestAdvertPrice }>
@@ -286,6 +286,7 @@
 
 		clearSeach = function(e) {
 			e.preventDefault();
+
 			this.state.filters = JSON.parse(this.originalState).filters;
 			this.state.filtersOpen = {};
 
@@ -294,17 +295,17 @@
 			document.addEventListener('scroll', this.scroll);
 		}
 
-		search = debounce(function(e) {
-			if ( e.target.tagName === 'INPUT' && e.keyCode === 13) {
+		search = function(e) {
+			if ( e.target.tagName === 'INPUT') {
 				this.state.filters.searchTerm = (e.target.value.length > 0) ? e.target.value : null;
 
-				getNewCars();
+				if (e.keyCode === 13) { getNewCars(); }
 			} else if ( e.type !== 'keyup') {
 				this.state.filters.searchTerm = e.target.parentNode.firstElementChild.value;
 
 				getNewCars();
 			}
-		}, 200);
+		};
 
 		// Temp hack to make it look like something is happening
 		shuffle = function(array) {
@@ -473,7 +474,6 @@
 			var xhr = new XMLHttpRequest();
 
 			xhr.addEventListener('load', function(data) {
-				console.log(JSON.parse(data.currentTarget.responseText));
 				var carsRepsonse = JSON.parse(data.currentTarget.responseText);
 
 					var datalist = [];
@@ -522,41 +522,23 @@
 			padding: 10px 0;
 			/*position: fixed;*/
 		}
-		.flex-container {
-			padding: 0;
-			margin: 0;
-			list-style: none;
-			display: -webkit-box;
-			display: -moz-box;
-			display: -ms-flexbox;
-			display: -webkit-flex;
-			display: flex;
-			-webkit-flex-flow: row wrap;
-			justify-content: space-around;
-		}
-		.flex-item {
-			padding: 5px;
-			font-weight: bold;
-			font-size: 1.5em;
-			text-align: center;
-		}
 		.search_sidebar,
 		.search_results {
 			width: 100%;
 		}
-		@media only screen and (min-width: 720px) {
-			.search_sidebar {
-				position: fixed;
-				width: 50%;
-				padding: 0 10px;
-			}
-			.search_results {
-				float: right;
-				min-height: 600px;
-				position: relative;
-				width: 50%;
-				padding: 0 10px 100px 10px;
-			}
+
+		.search_sidebar {
+			float: left;
+			width: 384px;
+			padding: 0 10px;
+		}
+
+		.search_results {
+			float: right;
+			min-height: calc(100vh + 1px);
+			position: relative;
+			width: calc(100% - 384px - 60px);
+			padding: 0 10px 100px 10px;
 		}
 
 		.search_filters_dropdowns {
@@ -598,6 +580,7 @@
 
 		.search_sidebar .search_refine {
 			background-color: #ff8100;
+			clear: both;
 			color: #fff;
 			margin: 10px 0;
 			padding: 10px;
