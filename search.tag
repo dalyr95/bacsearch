@@ -7,12 +7,12 @@
 		<form class="search_form" onsubmit={ searchSubmit }>
 			<input type="text" id="search-search" name="search-cars" value={ state.filters.searchTerm } onkeyup={ search } list="search-cars"/>
 				<datalist id="search-cars">
-						<option each={ name, i in state.datalist } value={ name }>
+					<option each={ name, i in state.datalist } value={ name }>
 				</datalist>
 			<button class="btn btn_btn_standard" onclick={ search }>Search</button>
 		</form>
 		<h6 class="search_refine">
-			Refine your search
+			Refine your search<br/>
 			<a href="#" onclick={ clearSeach }>Clear search</a>
 		</h6>
 
@@ -108,7 +108,7 @@
 				</span>
 				<div class="search_result_content">
 					<span>Used car - { value.inStockDeals === 0 ? 'in stock' : 'out of stock' }</span>
-					<h4>{ value.fullName }</h4>
+					<h5>{ value.fullName }</h5>
 					<p>More info on this car</p>
 				</div>
 				<div class="search_result_price" if={ value.cheapestAdvertPrice }>
@@ -259,6 +259,7 @@
 
 		removeFilter = function(e) {
 			e.preventDefault();
+
 			var data = e.currentTarget.dataset;
 
 			delete this.state.filters.filtersSelected[data.filter][data.option];
@@ -496,7 +497,7 @@
 				var height  = filters[0].children[0].getBoundingClientRect().height;
 
 				filters.forEach(function(f) {
-						f.previousElementSibling.previousElementSibling.dataset.height = f.children.length * height;
+					f.previousElementSibling.previousElementSibling.dataset.height = f.children.length * height;
 				});
 		});
 
@@ -547,6 +548,10 @@
 			width: 100%;
 		}
 
+		.search_sidebar .search_form {
+			overflow: hidden;
+		}
+
 		.search_sidebar .search_form input {
 			border-radius: 4px;
 			border:  1px solid #d9d9d9;
@@ -585,6 +590,13 @@
 			margin: 10px 0;
 			padding: 10px;
 			text-transform: uppercase;
+		}
+
+		.search_sidebar .search_refine a {
+			clear: both;
+			color: #fff;
+			font-size: 14px;
+			font-weight: normal;
 		}
 
 		.search_sidebar .search_filters {
