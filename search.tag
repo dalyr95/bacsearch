@@ -51,12 +51,8 @@
 							</li>
 						</ul>
 					</div>
-					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? state.filtersOpen['model'] : '0' }px">
-						<li data-option="model-1" class={ selected : state.filters.filtersSelected.model['model-1'] }>Model 1</li>
-						<li data-option="model-2" class={ selected : state.filters.filtersSelected.model['model-2'] }>Model 2</li>
-						<li data-option="model-3" class={ selected : state.filters.filtersSelected.model['model-3'] }>Model 3</li>
-						<li data-option="model-4" class={ selected : state.filters.filtersSelected.model['model-4'] }>Model 4</li>
-						<li data-option="model-5" class={ selected : state.filters.filtersSelected.model['model-5'] }>Model 5</li>
+					<ul if={ state.filters.filtersSelected.make } class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? state.filtersOpen['model'] : '0' }px">
+						<li each={ value, key in filterMakes() } data-option={ value.name } class={ selected : state.filters.filtersSelected.model[value.name] }>{ value.name }</li>
 					</ul>
 				</div>
 
@@ -384,7 +380,19 @@
 
 
             return hasFilters;
-        }
+        };
+
+        this.filterMakes = function() {
+	        var models = this.state.sidebar.makes.filter(function(make) {
+        		return ( this.state.filters.filtersSelected.make[make.name] );
+        	}.bind(this));
+        	var makesModels = [];
+        	models.forEach(function(make) {
+        		makesModels = makesModels.concat(make.models);
+        	});
+        	console.log(2, makesModels);
+        	return makesModels;
+        };
 
 		var parseQueryString = function( queryString ) {
 			var params = {}, queries, temp, i, l;
@@ -492,7 +500,6 @@
 
 		this.on('updated', function() {
 				var filters = [].slice.call(this.root.getElementsByClassName('search_filters_options'));
-				console.log(filters);
 				if ( filters[0].children[0] ) {
 					var height  = filters[0].children[0].getBoundingClientRect().height;
 					filters.forEach(function(f) {
