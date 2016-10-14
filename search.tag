@@ -477,15 +477,16 @@
 			xhr.addEventListener('load', function(data) {
 				var carsRepsonse = JSON.parse(data.currentTarget.responseText);
 
-					var datalist = [];
-					carsRepsonse.makes.forEach(function(make) {
-						datalist.push(make.name);
-						make.models.forEach(function(model) {
-								datalist.push(make.name + ' ' + model.name);
-						});
+				var datalist = [];
+				carsRepsonse.makes.forEach(function(make) {
+					datalist.push(make.name);
+					make.models.forEach(function(model) {
+						datalist.push(make.name + ' ' + model.name);
 					});
+				});
 
-					this.state.datalist = datalist;
+				this.state.datalist = datalist;
+				this.update();
 			}.bind(this));
 
 			xhr.open('GET', '/cars.json', true);
@@ -493,12 +494,12 @@
 		});
 
 		this.on('updated', function() {
-				var filters = [].slice.call(this.root.getElementsByClassName('search_filters_options'));
-				var height  = filters[0].children[0].getBoundingClientRect().height;
+			var filters = [].slice.call(this.root.getElementsByClassName('search_filters_options'));
+			var height  = filters[0].children[0].getBoundingClientRect().height;
 
-				filters.forEach(function(f) {
-					f.previousElementSibling.previousElementSibling.dataset.height = f.children.length * height;
-				});
+			filters.forEach(function(f) {
+				f.previousElementSibling.previousElementSibling.dataset.height = f.children.length * height;
+			});
 		});
 
 	</script>
