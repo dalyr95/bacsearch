@@ -38,11 +38,7 @@
 						</ul>
 					</div>
 					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['make']) ? state.filtersOpen['make'] : '0' }px">
-						<li data-option="make-1" class={ selected : state.filters.filtersSelected.make['make-1'] }>Make 1</li>
-						<li data-option="make-2" class={ selected : state.filters.filtersSelected.make['make-2'] }>Make 2</li>
-						<li data-option="make-3" class={ selected : state.filters.filtersSelected.make['make-3'] }>Make 3</li>
-						<li data-option="make-4" class={ selected : state.filters.filtersSelected.make['make-4'] }>Make 4</li>
-						<li data-option="make-5" class={ selected : state.filters.filtersSelected.make['make-5'] }>Make 5</li>
+						<li each={ state.sidebar.makes } data-option={ name } class={ selected : state.filters.filtersSelected.make[name] }>{ name } ({ models.length })</li>
 					</ul>
 				</div>
 
@@ -55,12 +51,8 @@
 							</li>
 						</ul>
 					</div>
-					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? state.filtersOpen['model'] : '0' }px">
-						<li data-option="model-1" class={ selected : state.filters.filtersSelected.model['model-1'] }>Model 1</li>
-						<li data-option="model-2" class={ selected : state.filters.filtersSelected.model['model-2'] }>Model 2</li>
-						<li data-option="model-3" class={ selected : state.filters.filtersSelected.model['model-3'] }>Model 3</li>
-						<li data-option="model-4" class={ selected : state.filters.filtersSelected.model['model-4'] }>Model 4</li>
-						<li data-option="model-5" class={ selected : state.filters.filtersSelected.model['model-5'] }>Model 5</li>
+					<ul if={ state.filters.filtersSelected.make } class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? state.filtersOpen['model'] : '0' }px">
+						<li each={ value, key in filterMakes() } data-option={ value.name } class={ selected : state.filters.filtersSelected.model[value.name] }>{ value.name }</li>
 					</ul>
 				</div>
 
@@ -144,7 +136,8 @@
 			},
 			height: 0,
 			pagination: 1,
-			disableAnimations: false
+			disableAnimations: false,
+			sidebar: {}
 		};
 
 		this.originalState = JSON.stringify(this.state);
@@ -241,12 +234,12 @@
 				}
 			} else if ( this.state.filters.filtersSelected[filter] ) {
 				// If filter already has one selected, then add new option
-				this.state.filters.filtersSelected[filter][option] = e.target.innerText;
+				this.state.filters.filtersSelected[filter][option] = e.target.dataset.option;
 			} else {
 				// If filter hasn't got anything selected, then create
 				this.state.filters.filtersSelected[filter] = {};
 				// and add option
-				this.state.filters.filtersSelected[filter][option] = e.target.innerText;
+				this.state.filters.filtersSelected[filter][option] = e.target.dataset.option;
 			}
 
 			getNewCars();
@@ -387,7 +380,19 @@
 
 
             return hasFilters;
-        }
+        };
+
+        this.filterMakes = function() {
+	        var models = this.state.sidebar.makes.filter(function(make) {
+        		return ( this.state.filters.filtersSelected.make[make.name] );
+        	}.bind(this));
+        	var makesModels = [];
+        	models.forEach(function(make) {
+        		makesModels = makesModels.concat(make.models);
+        	});
+        	console.log(2, makesModels);
+        	return makesModels;
+        };
 
 		var parseQueryString = function( queryString ) {
 			var params = {}, queries, temp, i, l;
@@ -415,7 +420,7 @@
 
 						values.forEach(function(v) {
 							filters.filtersSelected[key]    = filters.filtersSelected[key] || {};
-							filters.filtersSelected[key][v] = decodeURIComponent(true);
+							filters.filtersSelected[key][v] = decodeURIComponent(v);
 						});
 					}
 				}
@@ -485,8 +490,9 @@
 					});
 				});
 
-				this.state.datalist = datalist;
-				this.update();
+					this.state.datalist = datalist;
+					this.state.sidebar.makes = carsRepsonse.makes;
+					this.update();
 			}.bind(this));
 
 			xhr.open('GET', '/cars.json', true);
@@ -495,11 +501,12 @@
 
 		this.on('updated', function() {
 			var filters = [].slice.call(this.root.getElementsByClassName('search_filters_options'));
-			var height  = filters[0].children[0].getBoundingClientRect().height;
-
-			filters.forEach(function(f) {
-				f.previousElementSibling.previousElementSibling.dataset.height = f.children.length * height;
-			});
+			if ( filters[0].children[0] ) {
+				var height  = filters[0].children[0].getBoundingClientRect().height;
+				filters.forEach(function(f) {
+					f.previousElementSibling.previousElementSibling.dataset.height = f.children.length * height;
+				});
+			}
 		});
 
 	</script>
