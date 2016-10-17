@@ -37,12 +37,12 @@
 							</li>
 						</ul>
 					</div>
-					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['make']) ? state.filtersOpen['make'] : '0' }px">
+					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['make']) ? state.sidebar.makes.length * height: '0' }px">
 						<li each={ state.sidebar.makes } data-option={ name } class={ selected : state.filters.filtersSelected.make[name] }>{ name } ({ models.length })</li>
 					</ul>
 				</div>
 
-				<div class={ (state.filtersOpen['model']) ? 'open' : '' }>
+				<div class={ (state.filtersOpen['model'] && state.sidebar.models.length > 0) ? 'open' : '' }>
 					<h6 data-filter="model" onclick={ filters }>Model</h6>
 					<div class="search_filters_selected">
 						<ul>
@@ -51,8 +51,8 @@
 							</li>
 						</ul>
 					</div>
-					<ul if={ state.filters.filtersSelected.make } class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? state.filtersOpen['model'] : '0' }px">
-						<li each={ value, key in filterMakes() } data-option={ value.name } class={ selected : state.filters.filtersSelected.model[value.name] }>{ value.name }</li>
+					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? state.sidebar.models.length * height : '0' }px">
+						<li each={ value, key in state.sidebar.models } data-option={ value.name } class={ selected : state.filters.filtersSelected.model[value.name] }>{ value.name }</li>
 					</ul>
 				</div>
 
@@ -122,6 +122,7 @@
 	<script>
 		window.tag = this;
 		this.currency   = '£';
+		this.height 	= 22;
 
 		this.state = {
 			loading: true,
@@ -137,7 +138,10 @@
 			height: 0,
 			pagination: 1,
 			disableAnimations: false,
-			sidebar: {}
+			sidebar: {
+				makes: 	[],
+				models: []
+			}
 		};
 
 		this.originalState = JSON.stringify(this.state);
@@ -218,7 +222,7 @@
 			if (this.state.filtersOpen[filter]) {
 				delete this.state.filtersOpen[filter];
 			} else {
-				this.state.filtersOpen[filter] = e.currentTarget.dataset.height;
+				this.state.filtersOpen[filter] = true;
 			}
 		}
 
@@ -382,17 +386,24 @@
             return hasFilters;
         };
 
-        this.filterMakes = function() {
-	        var models = this.state.sidebar.makes.filter(function(make) {
-        		return ( this.state.filters.filtersSelected.make[make.name] );
-        	}.bind(this));
+        var filterMakes = function() {
         	var makesModels = [];
-        	models.forEach(function(make) {
-        		makesModels = makesModels.concat(make.models);
-        	});
-        	console.log(2, makesModels);
-        	return makesModels;
-        };
+
+        	if (this.state.filters.filtersSelected.make) {
+
+		        var models = this.state.sidebar.makes.filter(function(make) {
+		        	console.log(make, this.state.filters.filtersSelected);
+	        		return ( this.state.filters.filtersSelected.make[make.name] );
+	        	}.bind(this));
+
+	        	models.forEach(function(make) {
+	        		makesModels = makesModels.concat(make.models);
+	        	});
+
+	        }
+
+        	this.state.sidebar.models = makesModels;
+        }.bind(this);
 
 		var parseQueryString = function( queryString ) {
 			var params = {}, queries, temp, i, l;
@@ -490,23 +501,21 @@
 					});
 				});
 
-					this.state.datalist = datalist;
-					this.state.sidebar.makes = carsRepsonse.makes;
-					this.update();
+				this.state.datalist = datalist;
+				this.state.sidebar.makes = carsRepsonse.makes;
+				this.update();
 			}.bind(this));
 
 			xhr.open('GET', '/cars.json', true);
 			xhr.send();
 		});
 
-		this.on('updated', function() {
-			var filters = [].slice.call(this.root.getElementsByClassName('search_filters_options'));
-			if ( filters[0].children[0] ) {
-				var height  = filters[0].children[0].getBoundingClientRect().height;
-				filters.forEach(function(f) {
-					f.previousElementSibling.previousElementSibling.dataset.height = f.children.length * height;
-				});
-			}
+		// If any dependent logic processing needs to be done, we can do it in here
+		// For example, someone clicks on a make, now we need to update models, can do it in here
+		// instead of having function calls dotting everywhere
+		// Same idea as the React `render` function
+		this.on('update', function() {
+			filterMakes();
 		});
 
 	</script>
@@ -730,6 +739,9 @@
 		.search_sidebar .search_filters_dropdowns .search_filters_options li {
 			cursor: pointer;
 			padding: 2px 5px;
+		    overflow: hidden;
+		    text-overflow: ellipsis;
+		    white-space: nowrap;
 		}
 
 		.search_sidebar .search_filters_dropdowns .search_filters_options li.selected {
