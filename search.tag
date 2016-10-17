@@ -392,7 +392,6 @@
         	if (this.state.filters.filtersSelected.make) {
 
 		        var models = this.state.sidebar.makes.filter(function(make) {
-		        	console.log(make, this.state.filters.filtersSelected);
 	        		return ( this.state.filters.filtersSelected.make[make.name] );
 	        	}.bind(this));
 
@@ -431,7 +430,7 @@
 
 						values.forEach(function(v) {
 							filters.filtersSelected[key]    = filters.filtersSelected[key] || {};
-							filters.filtersSelected[key][v] = decodeURIComponent(v);
+							filters.filtersSelected[key][decodeURIComponent(v)] = decodeURIComponent(v);
 						});
 					}
 				}
@@ -774,7 +773,8 @@
 			max-width: 0;
 			position: relative;
 			overflow: hidden;
-			animation-duration: 0.4s;
+			transform: translate3d(0,0,0);
+			animation-duration: 0.6s;
 			animation-fill-mode: forwards;
 			animation-name: filterSlide;
 		}
@@ -866,6 +866,7 @@
 			position: relative;
 			overflow: hidden;
 			opacity: 0;
+			transform: translate3d(0,0,0);
 			animation-name: slideIn;
 			animation-fill-mode: forwards;
 			animation-duration: 0.2s;
@@ -873,14 +874,14 @@
 
 		@keyframes slideIn {
 			from {
-				transform: translateX(-50px);
+				transform: translate3d(-50px,0,0);
 				opacity: 0;
 			}
 			50% {
 				opacity: 1;
 			}
 			to {
-				transform: translateX(0);
+				transform: translate3d(0,0,0);
 				opacity: 1;
 			}
 		}
