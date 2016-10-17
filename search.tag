@@ -57,7 +57,7 @@
 				</div>
 
 				<div class={ (state.filtersOpen['price']) ? 'open' : '' }>
-					<h6 data-filter="price" onclick={ filters }>Price</h6>
+					<h6 data-filter="price" onclick={ filters }>Price Range</h6>
 					<div class="search_filters_selected">
 						<ul>
 							<li each={ key, value in state.filters.filtersSelected.price } data-filter="price" data-option={ key } onClick={ removeFilter }>
@@ -65,10 +65,19 @@
 							</li>
 						</ul>
 					</div>
-					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['price']) ? state.filtersOpen['price'] : '0' }px">
-						<li data-option="price-1" class={ selected : state.filters.filtersSelected.price['price-1'] }>Price 1</li>
-						<li data-option="price-2" class={ selected : state.filters.filtersSelected.price['price-2'] }>Price 2</li>
-						<li data-option="price-3" class={ selected : state.filters.filtersSelected.price['price-3'] }>Price 3</li>
+					<ul class="search_filters_options" style="height: { (state.filtersOpen['price']) ? '52' : '0' }px">
+						<li>
+							<label>
+								Min:<input type="number" name="minPrice" value={ state.filters.filtersSelected.minPrice.minPrice } min="0" max="50000" step="1" pattern="[0-9]*" onchange={ changeOption } />
+								<div if={ state.filters.filtersSelected.minPrice.minPrice } class="search_option_clear" onclick={ clearOption }>&times;</div>
+							</label>
+						</li>
+						<li>
+							<label>
+								Max:<input type="number" name="maxPrice" value={ state.filters.filtersSelected.maxPrice.maxPrice } min="0" max="100000" step="1" pattern="[0-9]*" onchange={ changeOption } />
+								<div if={ state.filters.filtersSelected.maxPrice.maxPrice } class="search_option_clear" onclick={ clearOption }>&times;</div>
+							</label>
+						</li>
 					</ul>
 				</div>
 
@@ -249,6 +258,24 @@
 			getNewCars();
 		}
 
+		changeOption = function(e) {
+			var target 	= e.currentTarget;
+			var key 	= target.name;
+
+			this.state.filters.filtersSelected[key] = {};
+			this.state.filters.filtersSelected[key][key] = target.value;
+
+			getNewCars();
+		}
+
+		clearOption = function(e) {
+			var name = e.currentTarget.previousElementSibling.name;
+			
+			delete this.state.filters.filtersSelected[name];
+
+			getNewCars();
+		}
+
 		resetResults = function() {
 			window.scrollTo(0, 0);
 			this.state.pagination = 1;
@@ -347,7 +374,8 @@
 						query.push(key + '=' + encodeURIComponent(filters[key]));
 					} else {
 						Object.keys(filters[key]).forEach(function(k) {
-							query.push(k + '=' + Object.keys(filters[key][k]));
+							console.log(123, k + '=' + Object.keys(filters[key][k]));
+							query.push(k + '=' + _values(filters[key][k]));
 						});
 					}
 				}
@@ -416,6 +444,19 @@
 			return params;
 		};
 
+		var _values = function(obj) {
+			if (Object.values) {
+				return Object.values(obj);
+			} else {
+				var values = [];
+				Object.keys(obj).forEach(function(value) {
+					values.push(obj[value]);
+				});
+
+				return values;
+			}
+		}
+
 		this.on('before-mount', function() {
 			var query   = window.location.search.replace(/^\?/, '');
 			var filters = this.state.filters;
@@ -429,8 +470,11 @@
 						var values = query[key].split(',');
 
 						values.forEach(function(v) {
-							filters.filtersSelected[key]    = filters.filtersSelected[key] || {};
-							filters.filtersSelected[key][decodeURIComponent(v)] = decodeURIComponent(v);
+							// Hack to make make/model work
+							var k = (key === 'make' || key === 'model') ? v : key;
+
+							filters.filtersSelected[key]    					= filters.filtersSelected[key] || {};
+							filters.filtersSelected[key][decodeURIComponent(k)] = decodeURIComponent(v);
 						});
 					}
 				}
@@ -759,6 +803,11 @@
 		.search_sidebar .search_filters_dropdowns .search_filters_options li:active {
 			background-color: #ff8100;
 			color: #fff;
+		}
+
+		.search_sidebar .search_filters_dropdowns .search_option_clear {
+			cursor: pointer;
+			float: right;
 		}
 
 		.search_sidebar .search_filters_selected li {
