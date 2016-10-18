@@ -93,6 +93,43 @@
 					</ul>
 				</div>
 
+				<div class={ (state.filtersOpen['mileage']) ? 'open' : '' }>
+					<h6 data-filter="mileage" onclick={ filters }>Mileage</h6>
+					<div class="search_filters_selected">
+						<ul>
+							<li each={ key, value in state.filters.filtersSelected.mileage } data-filter="mileage" data-option={ key } onClick={ removeFilter }>
+								<span>{ value }</span>
+							</li>
+						</ul>
+					</div>
+					<ul class="search_filters_options" style="height: { (state.filtersOpen['mileage']) ? '52' : '0' }px">
+						<li>
+							<label>
+								From:
+								<select name="fromMileage" value={ state.filters.filtersSelected.fromMileage.fromMileage } onchange={ changeOption }>
+									<option disabled value>(any)</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+								</select>
+								<div if={ state.filters.filtersSelected.fromMileage.fromMileage } class="search_option_clear" onclick={ clearOption }>&times;</div>
+							</label>
+						</li>
+						<li>
+							<label>
+								To:
+								<select name="toMileage" value={ state.filters.filtersSelected.toMileage.toMileage } onchange={ changeOption }>
+									<option disabled value>(any)</option>
+									<option>100</option>
+									<option>200</option>
+									<option>300</option>
+								</select>
+								<div if={ state.filters.filtersSelected.toMileage.toMileage } class="search_option_clear" onclick={ clearOption }>&times;</div>
+							</label>
+						</li>
+					</ul>
+				</div>
+
 			</div>
 
 		</div>
@@ -154,7 +191,8 @@
 				carType: null,
 				filtersSelected: {},
 				searchTerm: null,
-				sort: null
+				sort: null,
+				mileage: null
 			},
 			height: 0,
 			pagination: 1,
