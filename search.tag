@@ -37,8 +37,11 @@
 							</li>
 						</ul>
 					</div>
-					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['make']) ? state.sidebar.makes.length * height: '0' }px">
-						<li each={ state.sidebar.makes } data-option={ name } class={ selected : state.filters.filtersSelected.make[name] }>{ name } ({ models.length })</li>
+					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['make']) ? (calculateVisible(state.sidebar.makes) + 1) * height: '0' }px">
+						<li class="search_filter">
+							<input type="search" placeholder="filter" data-key="makes" onkeyup={ filterOptions } />
+						</li>
+						<li each={ state.sidebar.makes } if={ show !== false } data-option={ name } class={ selected : state.filters.filtersSelected.make[name] }>{ name } ({ models.length })</li>
 					</ul>
 				</div>
 
@@ -51,8 +54,11 @@
 							</li>
 						</ul>
 					</div>
-					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? state.sidebar.models.length * height : '0' }px">
-						<li each={ value, key in state.sidebar.models } data-option={ value.name } class={ selected : state.filters.filtersSelected.model[value.name] }>{ value.name }</li>
+					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? (calculateVisible(state.sidebar.models) + 1) * height : '0' }px">
+						<li class="search_filter">
+							<input type="search" placeholder="filter" data-key="models" onkeyup={ filterOptions } />
+						</li>
+						<li each={ state.sidebar.models } if={ show !== false } data-option={ name } class={ selected : state.filters.filtersSelected.model[name] }>{ name }</li>
 					</ul>
 				</div>
 
@@ -239,6 +245,8 @@
 			var filter = e.currentTarget.previousElementSibling.previousElementSibling.dataset.filter;
 			var option = e.target.dataset.option;
 
+			if (!option) { return; }
+
 			if ( this.state.filters.filtersSelected[filter] && this.state.filters.filtersSelected[filter][option] ) {
 				// Delete already selected option
 				delete this.state.filters.filtersSelected[filter][option];
@@ -256,6 +264,24 @@
 			}
 
 			getNewCars();
+		}
+
+		filterOptions = function(e) {
+			var target 	= e.currentTarget;
+			var key 	= target.dataset.key;
+			var value 	= target.value;
+
+			var reg = new RegExp(value, 'gi');
+
+			this.state.sidebar[key].forEach(function(value) {
+				value.show = (value.name.search(reg) >= 0);
+			});
+		}
+
+		this.calculateVisible = function(arr) {
+			return arr.filter(function(value) {
+				return value.show !== false;
+			}).length;
 		}
 
 		changeOption = function(e) {
@@ -374,7 +400,6 @@
 						query.push(key + '=' + encodeURIComponent(filters[key]));
 					} else {
 						Object.keys(filters[key]).forEach(function(k) {
-							console.log(123, k + '=' + Object.keys(filters[key][k]));
 							query.push(k + '=' + _values(filters[key][k]));
 						});
 					}
@@ -433,8 +458,6 @@
         }.bind(this);
 
         var removeSurplusModels = function() {
-        	console.log('removeSurplusModels', this.state.sidebar.models);
-
         	if (this.state.filters.filtersSelected.model) {
         		var removeModel = [];
         		var sidebar = this.state.sidebar.models;
