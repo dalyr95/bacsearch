@@ -260,7 +260,6 @@
 		};
 
 		searchSubmit = function(e) {
-			console.log('searchSubmit');
 			e.preventDefault();
 		};
 
