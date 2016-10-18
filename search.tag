@@ -13,7 +13,7 @@
 		</form>
 		<h6 class="search_refine">
 			Refine your search<br/>
-			<a href="#" onclick={ clearSeach }>Clear search</a>
+			<a class="clear_search" href="#" onclick={ clearSeach }><i class="clear_icon">&times;</i>Clear search</a>
 		</h6>
 
 		<div class="search_filters">
@@ -43,12 +43,12 @@
 						</li>
 						<li each={ state.sidebar.makes } if={ show !== false } data-option={ name } class={ selected : state.filters.filtersSelected.make[name] }>{ name } ({ models.length })</li>
 					</ul>
-					<div if={ calculateVisible(state.sidebar.makes) === 0}>
+					<div if={ calculateVisible(state.sidebar.makes) === 0 && state.filters.filtersSelected.make}>
 						No results for your search.
 					</div>
 				</div>
 
-				<div class={ (state.filtersOpen['model'] && state.sidebar.models.length > 0) ? 'open' : '' }>
+				<div class={ (state.filtersOpen['model'] && state.filters.filtersSelected.make && state.sidebar.models.length > 0) ? 'open' : '' }>
 					<h6 data-filter="model" onclick={ filters }>Model</h6>
 					<div class="search_filters_selected">
 						<ul>
@@ -57,13 +57,13 @@
 							</li>
 						</ul>
 					</div>
-					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? (calculateVisible(state.sidebar.models) + 1) * height : '0' }px">
+					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model'] && state.filters.filtersSelected.make) ? (calculateVisible(state.sidebar.models) + 1) * height : '0' }px">
 						<li class="search_filter">
 							<input type="search" placeholder="filter" data-key="models" onkeyup={ filterOptions } />
 						</li>
 						<li each={ state.sidebar.models } if={ show !== false } data-option={ name } class={ selected : state.filters.filtersSelected.model[name] }>{ name }</li>
 					</ul>
-					<div if={ calculateVisible(state.sidebar.models) === 0}>
+					<div if={ calculateVisible(state.sidebar.models) === 0 && state.filters.filtersSelected.make }>
 						No results for your search.
 					</div>
 				</div>
@@ -88,6 +88,43 @@
 							<label>
 								Max:<input type="number" name="maxPrice" value={ state.filters.filtersSelected.maxPrice.maxPrice } min="0" max="100000" step="1" pattern="[0-9]*" onchange={ changeOption } />
 								<div if={ state.filters.filtersSelected.maxPrice.maxPrice } class="search_option_clear" onclick={ clearOption }>&times;</div>
+							</label>
+						</li>
+					</ul>
+				</div>
+
+				<div class={ (state.filtersOpen['mileage']) ? 'open' : '' }>
+					<h6 data-filter="mileage" onclick={ filters }>Mileage</h6>
+					<div class="search_filters_selected">
+						<ul>
+							<li each={ key, value in state.filters.filtersSelected.mileage } data-filter="mileage" data-option={ key } onClick={ removeFilter }>
+								<span>{ value }</span>
+							</li>
+						</ul>
+					</div>
+					<ul class="search_filters_options" style="height: { (state.filtersOpen['mileage']) ? '52' : '0' }px">
+						<li>
+							<label>
+								From:
+								<select name="fromMileage" value={ state.filters.filtersSelected.fromMileage.fromMileage } onchange={ changeOption }>
+									<option disabled value>(any)</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+								</select>
+								<div if={ state.filters.filtersSelected.fromMileage.fromMileage } class="search_option_clear" onclick={ clearOption }>&times;</div>
+							</label>
+						</li>
+						<li>
+							<label>
+								To:
+								<select name="toMileage" value={ state.filters.filtersSelected.toMileage.toMileage } onchange={ changeOption }>
+									<option disabled value>(any)</option>
+									<option>100</option>
+									<option>200</option>
+									<option>300</option>
+								</select>
+								<div if={ state.filters.filtersSelected.toMileage.toMileage } class="search_option_clear" onclick={ clearOption }>&times;</div>
 							</label>
 						</li>
 					</ul>
@@ -137,7 +174,7 @@
 	<div if={ state.loading === false && state.cars.length === 0 } class="search_results no_results">
         No cars found
         <button if={ (filtersExist() === true) } onclick={ goBack }>Remove last filter</button>
-        <button if={ (filtersExist() === true) } onclick={ clearSeach }>Clear search</button>
+        <button if={ (filtersExist() === true) } onclick={ clearSeach }>&times; Clear search</button>
 	</div>
 
 	<script>
@@ -154,7 +191,8 @@
 				carType: null,
 				filtersSelected: {},
 				searchTerm: null,
-				sort: null
+				sort: null,
+				mileage: null
 			},
 			height: 0,
 			pagination: 1,
@@ -646,6 +684,27 @@
 			float: left;
 			width: 384px;
 			padding: 0 10px;
+		}
+		.clear_search {
+			text-transform: lowercase;
+		}
+		.clear_icon {
+			background-color: white;
+			color: #ff8100;
+			border-radius: 100%;
+			display: inline-block;
+			height: 1em;
+			width: 1em;
+			text-align: center;
+			line-height: 1em;
+			font-size: 1em;
+			text-decoration: none;
+			font-weight: 100;
+			font-style: normal;
+			margin: 0 6px 0 0;
+		}
+		.clear_search:hover .clear_icon {
+			opacity: 0.8;
 		}
 
 		.search_results {
