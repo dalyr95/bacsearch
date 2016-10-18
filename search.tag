@@ -43,6 +43,9 @@
 						</li>
 						<li each={ state.sidebar.makes } if={ show !== false } data-option={ name } class={ selected : state.filters.filtersSelected.make[name] }>{ name } ({ models.length })</li>
 					</ul>
+					<div if={ calculateVisible(state.sidebar.makes) === 0}>
+						No results for your search.
+					</div>
 				</div>
 
 				<div class={ (state.filtersOpen['model'] && state.sidebar.models.length > 0) ? 'open' : '' }>
@@ -60,6 +63,9 @@
 						</li>
 						<li each={ state.sidebar.models } if={ show !== false } data-option={ name } class={ selected : state.filters.filtersSelected.model[name] }>{ name }</li>
 					</ul>
+					<div if={ calculateVisible(state.sidebar.models) === 0}>
+						No results for your search.
+					</div>
 				</div>
 
 				<div class={ (state.filtersOpen['price']) ? 'open' : '' }>
