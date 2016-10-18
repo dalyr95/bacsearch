@@ -43,12 +43,12 @@
 						</li>
 						<li each={ state.sidebar.makes } if={ show !== false } data-option={ name } class={ selected : state.filters.filtersSelected.make[name] }>{ name } ({ models.length })</li>
 					</ul>
-					<div if={ calculateVisible(state.sidebar.makes) === 0}>
+					<div if={ calculateVisible(state.sidebar.makes) === 0 && state.filters.filtersSelected.make}>
 						No results for your search.
 					</div>
 				</div>
 
-				<div class={ (state.filtersOpen['model'] && state.sidebar.models.length > 0) ? 'open' : '' }>
+				<div class={ (state.filtersOpen['model'] && state.filters.filtersSelected.make && state.sidebar.models.length > 0) ? 'open' : '' }>
 					<h6 data-filter="model" onclick={ filters }>Model</h6>
 					<div class="search_filters_selected">
 						<ul>
@@ -57,7 +57,7 @@
 							</li>
 						</ul>
 					</div>
-					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model']) ? (calculateVisible(state.sidebar.models) + 1) * height : '0' }px">
+					<ul class="search_filters_options" onclick={ filterOption } style="height: { (state.filtersOpen['model'] && state.filters.filtersSelected.make) ? (calculateVisible(state.sidebar.models) + 1) * height : '0' }px">
 						<li class="search_filter">
 							<input type="search" placeholder="filter" data-key="models" onkeyup={ filterOptions } />
 						</li>
