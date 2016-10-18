@@ -107,7 +107,7 @@
 							<label>
 								From:
 								<select name="fromMileage" value={ state.filters.filtersSelected.fromMileage.fromMileage } onchange={ changeOption }>
-									<option disabled value>(any)</option>
+									<option value>(any)</option>
 									<option>1</option>
 									<option>2</option>
 									<option>3</option>
@@ -119,7 +119,7 @@
 							<label>
 								To:
 								<select name="toMileage" value={ state.filters.filtersSelected.toMileage.toMileage } onchange={ changeOption }>
-									<option disabled value>(any)</option>
+									<option value>(any)</option>
 									<option>100</option>
 									<option>200</option>
 									<option>300</option>
@@ -332,8 +332,12 @@
 			var target 	= e.currentTarget;
 			var key 	= target.name;
 
-			this.state.filters.filtersSelected[key] = {};
-			this.state.filters.filtersSelected[key][key] = target.value;
+			if ( target.value.length === 0 ) {
+				delete this.state.filters.filtersSelected[key];
+			} else {
+				this.state.filters.filtersSelected[key] = {};
+				this.state.filters.filtersSelected[key][key] = target.value;
+			}
 
 			getNewCars();
 		}
