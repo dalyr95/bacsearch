@@ -657,8 +657,8 @@
 		}
 
 		.search_filters_dropdowns {
-			overflow-y: auto;
-			max-height: calc(100vh - 180px);
+			/*overflow-y: auto;
+			max-height: calc(100vh - 180px);*/
 			width: 100%;
 		}
 
