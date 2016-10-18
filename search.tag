@@ -9,7 +9,7 @@
 				<datalist id="search-cars">
 					<option each={ name, i in state.datalist } value={ name }>
 				</datalist>
-			<button class="btn btn_btn_standard" onclick={ search }>Search</button>
+			<button type="button" class="btn btn_btn_standard" onclick={ search }>Search</button>
 		</form>
 		<h6 class="search_refine">
 			Refine your search<br/>
@@ -130,7 +130,25 @@
 					</ul>
 				</div>
 
+				<div class={ (state.filtersOpen['keyword']) ? 'open' : '' }>
+					<h6 data-filter="keyword" onclick={ filters }>Keyword search</h6>
+					<div class="search_filters_options">
+						<form class="search_form" onsubmit={ searchSubmit }>
+							<input type="text" id="add-keyword" name="add-keyword" onkeyup={ addKeyword } />
+							<button type="button" class="btn btn_btn_standard" onclick={ addKeyword }>Add Keyword</button>
+						</form>
+					</div>
+					<div class="search_filters_selected">
+						<ul>
+							<li each={ value, key in state.filters.searchKeyword.split(',') } data-option={ value } onClick={ removeKeyword }>
+								<span>{ value }</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+
 			</div>
+
 
 		</div>
 	</div>
@@ -192,7 +210,8 @@
 				filtersSelected: {},
 				searchTerm: null,
 				sort: null,
-				mileage: null
+				mileage: null,
+				searchKeyword: null
 			},
 			height: 0,
 			pagination: 1,
@@ -241,6 +260,7 @@
 		};
 
 		searchSubmit = function(e) {
+			console.log('searchSubmit');
 			e.preventDefault();
 		};
 
@@ -404,6 +424,35 @@
 
 				getNewCars();
 			}
+		};
+
+		addKeyword = function(e) {
+			if ( e.target.tagName === 'INPUT') {
+				if (e.keyCode === 13 && e.target.value.length > 0) {
+					this.state.filters.searchKeyword = (this.state.filters.searchKeyword) ? this.state.filters.searchKeyword + ',' + e.target.value : e.target.value;
+					getNewCars();
+
+					e.target.value = '';
+				}
+			} else if ( e.type !== 'keyup') {
+				this.state.filters.searchKeyword = (this.state.filters.searchKeyword) ? this.state.filters.searchKeyword + ',' + e.target.parentNode.firstElementChild.value : e.target.parentNode.firstElementChild.value;
+
+				getNewCars();
+
+				e.target.parentNode.firstElementChild.value = '';
+			}
+		};
+
+		removeKeyword = function(e) {
+			var keywords = this.state.filters.searchKeyword.split(',');
+			keywords.splice(keywords.indexOf(e.currentTarget.dataset.option), 1);
+
+			keywords = keywords.join();
+			keywords = (keywords.length === 0) ? null : keywords;
+
+			this.state.filters.searchKeyword = keywords;
+
+			getNewCars();
 		};
 
 		// Temp hack to make it look like something is happening
