@@ -63,7 +63,7 @@
 						</li>
 						<li each={ state.sidebar.models } if={ show !== false } data-option={ name } class={ selected : state.filters.filtersSelected.model[name] }>{ name }</li>
 					</ul>
-					<div if={ calculateVisible(state.sidebar.models) === 0}>
+					<div if={ calculateVisible(state.sidebar.models) === 0 && state.filters.filtersSelected.make }>
 						No results for your search.
 					</div>
 				</div>
