@@ -519,6 +519,12 @@
         			removeModel.forEach(function(key) {
         				delete this.state.filters.filtersSelected.model[key];
         			}.bind(this));
+
+        			if (Object.keys(this.state.filters.filtersSelected.model).length === 0) {
+        				delete this.state.filters.filtersSelected.model;
+        			}
+
+        			getNewCars();
         		}
         	}
         }.bind(this);
