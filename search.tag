@@ -13,7 +13,7 @@
 		</form>
 		<h6 class="search_refine">
 			Refine your search<br/>
-			<a href="#" onclick={ clearSeach }>Clear search</a>
+			<a class="clear_search" href="#" onclick={ clearSeach }><i class="clear_icon">&times;</i>Clear search</a>
 		</h6>
 
 		<div class="search_filters">
@@ -137,7 +137,7 @@
 	<div if={ state.loading === false && state.cars.length === 0 } class="search_results no_results">
         No cars found
         <button if={ (filtersExist() === true) } onclick={ goBack }>Remove last filter</button>
-        <button if={ (filtersExist() === true) } onclick={ clearSeach }>Clear search</button>
+        <button if={ (filtersExist() === true) } onclick={ clearSeach }>&times; Clear search</button>
 	</div>
 
 	<script>
@@ -646,6 +646,27 @@
 			float: left;
 			width: 384px;
 			padding: 0 10px;
+		}
+		.clear_search {
+			text-transform: lowercase;
+		}
+		.clear_icon {
+			background-color: white;
+			color: #ff8100;
+			border-radius: 100%;
+			display: inline-block;
+			height: 1em;
+			width: 1em;
+			text-align: center;
+			line-height: 1em;
+			font-size: 1em;
+			text-decoration: none;
+			font-weight: 100;
+			font-style: normal;
+			margin: 0 6px 0 0;
+		}
+		.clear_search:hover .clear_icon {
+			opacity: 0.8;
 		}
 
 		.search_results {
