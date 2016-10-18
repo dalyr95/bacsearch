@@ -910,20 +910,20 @@
 		    white-space: nowrap;
 		}
 
-		.search_sidebar .search_filters_dropdowns .search_filters_options li.selected {
+		.search_sidebar .search_filters_dropdowns .search_filters_options li.selected:not(.search_filter) {
 			background-color: rgba(254, 129, 0, 0.5);
 		}
 
-		.search_sidebar .search_filters_dropdowns .search_filters_options li.selected:hover {
+		.search_sidebar .search_filters_dropdowns .search_filters_options li.selected:not(.search_filter):hover {
 			background-color: rgba(254, 129, 0, 1);
 			color: #fff;
 		}
 
-		.search_sidebar .search_filters_dropdowns .search_filters_options li:hover {
+		.search_sidebar .search_filters_dropdowns .search_filters_options li:not(.search_filter):hover {
 			background-color: #ebebeb;
 		}
 
-		.search_sidebar .search_filters_dropdowns .search_filters_options li:active {
+		.search_sidebar .search_filters_dropdowns .search_filters_options li:not(.search_filter):active {
 			background-color: #ff8100;
 			color: #fff;
 		}
