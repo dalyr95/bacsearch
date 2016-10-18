@@ -426,6 +426,8 @@
 		};
 
 		addKeyword = function(e) {
+			if( e.target.value === '') { return; }
+
 			if ( e.target.tagName === 'INPUT') {
 				if (e.keyCode === 13 && e.target.value.length > 0) {
 					this.state.filters.searchKeyword = (this.state.filters.searchKeyword) ? this.state.filters.searchKeyword + ',' + e.target.value : e.target.value;
