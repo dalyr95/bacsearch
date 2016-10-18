@@ -432,6 +432,30 @@
         	this.state.sidebar.models = makesModels;
         }.bind(this);
 
+        var removeSurplusModels = function() {
+        	console.log('removeSurplusModels', this.state.sidebar.models);
+
+        	if (this.state.filters.filtersSelected.model) {
+        		var removeModel = [];
+        		var sidebar = this.state.sidebar.models;
+
+        		var models 	= Object.keys(this.state.filters.filtersSelected.model).forEach(function(model) {
+        			var match = false;
+        			sidebar.forEach(function(m) {
+        				if (m.name === model) { match = true; }
+        			});
+
+        			if (match === false) { removeModel.push(model); }
+        		});
+
+        		if (removeModel.length > 0) {
+        			removeModel.forEach(function(key) {
+        				delete this.state.filters.filtersSelected.model[key];
+        			}.bind(this));
+        		}
+        	}
+        }.bind(this);
+
 		var parseQueryString = function( queryString ) {
 			var params = {}, queries, temp, i, l;
 			// Split into key/value pairs
@@ -559,6 +583,7 @@
 		// Same idea as the React `render` function
 		this.on('update', function() {
 			filterMakes();
+			removeSurplusModels();
 		});
 
 	</script>
