@@ -146,10 +146,7 @@
 						</ul>
 					</div>
 				</div>
-
 			</div>
-
-
 		</div>
 	</div>
 
@@ -190,9 +187,9 @@
 	</div>
 
 	<div if={ state.loading === false && state.cars.length === 0 } class="search_results no_results">
-        No cars found
-        <button if={ (filtersExist() === true) } onclick={ goBack }>Remove last filter</button>
-        <button if={ (filtersExist() === true) } onclick={ clearSeach }>&times; Clear search</button>
+		No cars found
+		<button if={ (filtersExist() === true) } onclick={ goBack }>Remove last filter</button>
+		<button if={ (filtersExist() === true) } onclick={ clearSeach }>&times; Clear search</button>
 	</div>
 
 	<script>
@@ -266,6 +263,7 @@
 		displayResults = function(data) {
 			this.state.loading = false;
 			this.state.cars    = data;
+
 			// Hacky shite to shuffle cars
 			this.state.cars    = shuffle(this.state.cars);
 
@@ -280,7 +278,7 @@
 		appendResults = function(data) {
 			this.state.loading   = false;
 			this.state.appending = false;
-			this.state.cars      = this.state.cars.concat(data);
+			this.state.cars 	 = this.state.cars.concat(data);
 
 			this.update();
 
@@ -513,75 +511,75 @@
 
 		}.bind(this);
 
-        goBack = function() {
-            window.history.back();
-        }
+		goBack = function() {
+			window.history.back();
+		}
 
-        this.filtersExist = function() {
-            var hasFilters  = false;
-            var filters     = this.state.filters;
+		this.filtersExist = function() {
+			var hasFilters  = false;
+			var filters     = this.state.filters;
 
-            var keys = Object.keys(filters);
+			var keys = Object.keys(filters);
 
-            keys.forEach(function(key) {
-                if (filters[key]) {
-                    if (typeof filters[key] === 'object') {
-                        if (Object.keys(filters[key]).length > 0) { hasFilters = true; }
-                    } else {
-                        hasFilters = true;
-                    }
-                }
-            });
+			keys.forEach(function(key) {
+				if (filters[key]) {
+					if (typeof filters[key] === 'object') {
+						if (Object.keys(filters[key]).length > 0) { hasFilters = true; }
+					} else {
+						hasFilters = true;
+					}
+				}
+			});
 
 
-            return hasFilters;
-        };
+			return hasFilters;
+		};
 
-        var filterMakes = function() {
-        	var makesModels = [];
+		var filterMakes = function() {
+			var makesModels = [];
 
-        	if (this.state.filters.filtersSelected.make) {
+			if (this.state.filters.filtersSelected.make) {
 
-		        var models = this.state.sidebar.makes.filter(function(make) {
-	        		return ( this.state.filters.filtersSelected.make[make.name] );
-	        	}.bind(this));
+				var models = this.state.sidebar.makes.filter(function(make) {
+					return ( this.state.filters.filtersSelected.make[make.name] );
+				}.bind(this));
 
-	        	models.forEach(function(make) {
-	        		makesModels = makesModels.concat(make.models);
-	        	});
+				models.forEach(function(make) {
+					makesModels = makesModels.concat(make.models);
+				});
 
-	        }
+			}
 
-        	this.state.sidebar.models = makesModels;
-        }.bind(this);
+			this.state.sidebar.models = makesModels;
+		}.bind(this);
 
-        var removeSurplusModels = function() {
-        	if (this.state.filters.filtersSelected.model) {
-        		var removeModel = [];
-        		var sidebar = this.state.sidebar.models;
+		var removeSurplusModels = function() {
+			if (this.state.filters.filtersSelected.model) {
+				var removeModel = [];
+				var sidebar = this.state.sidebar.models;
 
-        		var models 	= Object.keys(this.state.filters.filtersSelected.model).forEach(function(model) {
-        			var match = false;
-        			sidebar.forEach(function(m) {
-        				if (m.name === model) { match = true; }
-        			});
+				var models 	= Object.keys(this.state.filters.filtersSelected.model).forEach(function(model) {
+					var match = false;
+					sidebar.forEach(function(m) {
+						if (m.name === model) { match = true; }
+					});
 
-        			if (match === false) { removeModel.push(model); }
-        		});
+					if (match === false) { removeModel.push(model); }
+				});
 
-        		if (removeModel.length > 0) {
-        			removeModel.forEach(function(key) {
-        				delete this.state.filters.filtersSelected.model[key];
-        			}.bind(this));
+				if (removeModel.length > 0) {
+					removeModel.forEach(function(key) {
+						delete this.state.filters.filtersSelected.model[key];
+					}.bind(this));
 
-        			if (Object.keys(this.state.filters.filtersSelected.model).length === 0) {
-        				delete this.state.filters.filtersSelected.model;
-        			}
+					if (Object.keys(this.state.filters.filtersSelected.model).length === 0) {
+						delete this.state.filters.filtersSelected.model;
+					}
 
-        			getNewCars();
-        		}
-        	}
-        }.bind(this);
+					getNewCars();
+				}
+			}
+		}.bind(this);
 
 		var parseQueryString = function( queryString ) {
 			var params = {}, queries, temp, i, l;
@@ -955,9 +953,9 @@
 		.search_sidebar .search_filters_dropdowns .search_filters_options li {
 			cursor: pointer;
 			padding: 2px 5px;
-		    overflow: hidden;
-		    text-overflow: ellipsis;
-		    white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 
 		.search_sidebar .search_filters_dropdowns .search_filters_options li.selected:not(.search_filter) {
