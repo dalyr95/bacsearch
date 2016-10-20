@@ -198,7 +198,7 @@
 	<script>
 		window.tag = this;
 		this.currency   = '£';
-		this.height 	= 22;
+		this.height 	= 26;
 
 		this.state = {
 			loading: true,
@@ -700,7 +700,7 @@
 				this.update();
 			}.bind(this));
 
-			xhr.open('GET', '/cars.json', true);
+			xhr.open('GET', 'cars.json', true);
 			xhr.send();
 		});
 
@@ -954,7 +954,9 @@
 
 		.search_sidebar .search_filters_dropdowns .search_filters_options li {
 			cursor: pointer;
-			padding: 2px 5px;
+			height: 26px;
+			line-height: 26px;
+			padding: 0 5px;
 		    overflow: hidden;
 		    text-overflow: ellipsis;
 		    white-space: nowrap;
