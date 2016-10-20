@@ -855,7 +855,7 @@
 			margin-left: 10px;
 			padding: 0 10px 0 26px;
 			position: relative;
-			transition: background-color 0.05s linear, border-color 0.05s linear;
+			transition: all 0.05s linear, border-color 0.05s linear;
 			-webkit-user-select: none;
 			-moz-user-select: none;
 			-ms-user-select: none;
@@ -876,6 +876,7 @@
 			position: absolute;
 			top: 5px;
 			transform: rotate(40deg);
+			transition: all 0.05s linear, border-color 0.05s linear;
 			width: 6px;
 		}
 
