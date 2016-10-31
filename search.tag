@@ -150,7 +150,7 @@
 		</div>
 	</div>
 
-	<div <div if={ state.cars.length > 0 } class="search_results {state.loading === true ? 'loading' : ''} { state.appending === true ? 'appending' : '' }">
+	<div if={ state.cars.length > 0 } class="search_results {state.loading === true ? 'loading' : ''} { state.appending === true ? 'appending' : '' }">
 		<ul>
 			<li>
 				<div class="results_total">1703 Results</div>
@@ -167,21 +167,35 @@
 		</ul>
 
 		<ul>
-			<li each={ value, key in state.cars } class="search_result" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;">
-				<span class="search_result_image">
-					<img src="//images.buyacar.co.uk/img/med/{ value.prodHomeIntImageFileName }" alt={ imgAltString } onload="this.style.opacity = 1;" />
-				</span>
-				<div class="search_result_content">
-					<span>Used car - { value.inStockDeals === 0 ? 'in stock' : 'out of stock' }</span>
-					<h5>{ value.fullName }</h5>
-					<p>More info on this car</p>
-				</div>
-				<div class="search_result_price" if={ value.cheapestAdvertPrice }>
-					{ currency }{ value.cheapestAdvertPrice }
-					<p if={ value.cheapestFinancePaymentAmount }>Or from<strong>{ currency }{ parseInt(value.cheapestFinancePaymentAmount, 10) }<sup>*</sup></strong>Per Month</p>
-				</div>
-				<a href='http://dev2.buyacar.co.uk/{ value.prodHomeUrlPath }deal_{ value.prodAdvertSeoString }.jhtml'></a>
-			</li>
+			<virtual each={ value, key in state.results }>
+				<li if={ value.type === 'result' } class="search_result" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;">
+					<span class="search_result_image">
+						<img src="//images.buyacar.co.uk/img/med/{ value.car.prodHomeIntImageFileName }" alt={ value.car.imgAltString } onload="this.style.opacity = 1;" />
+					</span>
+					<div class="search_result_content">
+						<span>Used car - { value.car.inStockDeals === 0 ? 'in stock' : 'out of stock' }</span>
+						<h5>{ value.car.fullName }</h5>
+						<p>More info on this car</p>
+					</div>
+					<div class="search_result_price" if={ value.car.cheapestAdvertPrice }>
+						{ currency }{ value.car.cheapestAdvertPrice }
+						<p if={ value.car.cheapestFinancePaymentAmount }>Or from<strong>{ currency }{ parseInt(value.car.cheapestFinancePaymentAmount, 10) }<sup>*</sup></strong>Per Month</p>
+					</div>
+					<a href='http://dev2.buyacar.co.uk{ value.car.prodHomeUrlPath }deal_{ value.car.prodAdvertSeoString }.jhtml'></a>
+				</li>
+
+				<li if={ Array.isArray(value) === true && value.length > 0 } class="search_result search_promo_results_block" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;">
+					<ul>
+						<li each={ v, k in value } class="search_promo_result">
+							<span class="search_result_image">
+								<img src="//images.buyacar.co.uk/img/med/{ v.car.prodHomeIntImageFileName }" alt={ v.car.imgAltString } onload="this.style.opacity = 1;" />
+							</span>
+							{ v.car.fullName }
+							<a href='http://dev2.buyacar.co.uk{ v.car.prodHomeUrlPath }deal_{ v.car.prodAdvertSeoString }.jhtml'></a>
+						</li>
+					</ul>
+				</li>
+			</virtual>
 		</ul>
 		<button class="btn btn_standard btn_load_more" if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
 	</div>
@@ -198,9 +212,11 @@
 		this.height 	= 26;
 
 		this.state = {
-			loading: true,
-			appending: false,
-			cars: [],
+			loading: 	true,
+			appending: 	false,
+			cars: 		[],
+			promoted: 	[],
+			results: 	[],
 			filtersOpen: {},
 			filters: {
 				carType: null,
@@ -210,7 +226,7 @@
 				mileage: null,
 				searchKeyword: null
 			},
-			height: 0,
+			height: 	0,
 			pagination: 1,
 			disableAnimations: false,
 			sidebar: {
@@ -265,7 +281,37 @@
 			this.state.cars    = data;
 
 			// Hacky shite to shuffle cars
-			this.state.cars    = shuffle(this.state.cars);
+			this.state.cars    	= shuffle(this.state.cars);
+			// For the promo block
+			this.state.promoted = shuffle(JSON.parse(JSON.stringify(this.state.cars)));
+
+			var cars = [];
+
+			this.state.promoted = this.state.promoted.map(function(car) {
+				if (car.type) { return car; }
+
+				return {
+					type: 'promoted',
+					car: car
+				};
+			});
+
+			this.state.cars = this.state.cars.map(function(car, i) {
+				if (car.type) { return car; }
+
+				return {
+					type: 'result',
+					car: car
+				};
+			});
+
+			this.state.results = this.state.cars.map(function(car, i) {
+				if (i !== 0 && (i + 1) % 4 === 0) {
+					return this.state.promoted.splice(0,6);
+				} else {
+					return car;
+				}
+			}.bind(this));
 
 			this.update();
 
@@ -280,13 +326,9 @@
 			this.state.appending = false;
 			this.state.cars 	 = this.state.cars.concat(data);
 
-			this.update();
+			displayResults(this.state.cars);
 
 			this.state.disableAnimations = false;
-
-			this.one('updated', function() {
-				this.state.height = parseInt(this.root.querySelector('.search_results').getBoundingClientRect().height, 10);
-			});
 
 		}.bind(this);
 
@@ -704,7 +746,7 @@
 
 		// If any dependent logic processing needs to be done, we can do it in here
 		// For example, someone clicks on a make, now we need to update models, can do it in here
-		// instead of having function calls dotting everywhere
+		// instead of having function calls dotted everywhere
 		// Same idea as the React `render` function
 		this.on('update', function() {
 			filterMakes();
@@ -1168,6 +1210,35 @@
 			top: 0;
 			width: 100%;
 			z-index: 10;
+		}
+
+		.search_results .search_promo_results_block {
+			overflow-x: auto;
+			white-space: nowrap;
+			-webkit-scroll-snap-type: mandatory;
+			-webkit-scroll-snap-align: start none;
+			-webkit-overflow-scrolling: touch;
+			scroll-snap-type: mandatory;
+			scroll-snap-align: start none;
+		}
+
+		.search_results .search_promo_result {
+			display: inline-block;
+			margin-right: 10px;
+			position: relative;
+			text-align: center;
+			white-space: normal;
+			width: 240px;
+			-webkit-scroll-snap-coordinate: 0 50%;
+			scroll-snap-coordinate: 0 50%;
+		}
+
+		.search_results .search_promo_result .search_result_image {
+			margin-bottom: 10px;
+			padding-bottom: 75%;
+			position: relative;
+			text-align: left;
+			width: 100%;
 		}
 	</style>
 </search>
