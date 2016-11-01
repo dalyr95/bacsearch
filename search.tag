@@ -1,3 +1,45 @@
+<search-promo>
+	<li class="search_result search_promo_results_block" style="animation-delay: { state.disableAnimations === true ? 0 : opts.key * 100 + 150}ms;">
+		<div if={ state.supportsSnap === false } class="search_promo_nav" data-vector="lt" onclick={ moveBack }>
+			&lt;
+		</div>
+		<ul>
+			<li each={ v, k in value } class="search_promo_result" style="transform: translateX(calc({ (position * 100) * -1 }% - { position * 10 }px));">
+				<span class="search_result_image">
+					<img src="//images.buyacar.co.uk/img/med/{ v.car.prodHomeIntImageFileName }" alt={ v.car.imgAltString } onload="this.style.opacity = 1;" />
+				</span>
+				{ v.car.fullName }
+				<a href='http://dev2.buyacar.co.uk{ v.car.prodHomeUrlPath }deal_{ v.car.prodAdvertSeoString }.jhtml'></a>
+			</li>
+		</ul>
+		<div if={ state.supportsSnap === false } class="search_promo_nav" data-vector="gt" onclick={ moveForward }>
+			&gt;
+		</div>
+	</li>
+
+	<script>
+		this.position = 0;
+
+		this.on('update', function() {
+			this.value 	= opts.value;
+			this.state 	= opts.state;
+			this.key 	= opts.key;
+		});
+
+		moveBack = function(e) {
+			console.log('moveBack');
+			this.position--;
+			if (this.position < 0) { this.position = 0; }
+		}
+
+		moveForward = function(e) {
+			console.log('moveForward');
+			this.position++;
+			if (this.position >= this.value.length - 1) { this.position = this.value.length - 1; }
+		}
+	</script>
+</search-promo>
+
 <search>
 
 	<header class="header">
@@ -150,7 +192,7 @@
 		</div>
 	</div>
 
-	<div if={ state.cars.length > 0 } class="search_results {state.loading === true ? 'loading' : ''} { state.appending === true ? 'appending' : '' }">
+	<div if={ state.cars.length > 0 } class="search_results {state.loading === true ? 'loading' : ''} { state.appending === true ? 'appending' : '' } { state.supportsSnap === true ? 'supportsSnap' : 'noSupportsSnap' }">
 		<ul>
 			<li>
 				<div class="results_total">1703 Results</div>
@@ -168,6 +210,7 @@
 
 		<ul>
 			<virtual each={ value, key in state.results }>
+
 				<li if={ value.type === 'result' } class="search_result" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;">
 					<span class="search_result_image">
 						<img src="//images.buyacar.co.uk/img/med/{ value.car.prodHomeIntImageFileName }" alt={ value.car.imgAltString } onload="this.style.opacity = 1;" />
@@ -184,17 +227,8 @@
 					<a href='http://dev2.buyacar.co.uk{ value.car.prodHomeUrlPath }deal_{ value.car.prodAdvertSeoString }.jhtml'></a>
 				</li>
 
-				<li if={ Array.isArray(value) === true && value.length > 0 } class="search_result search_promo_results_block" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;">
-					<ul>
-						<li each={ v, k in value } class="search_promo_result">
-							<span class="search_result_image">
-								<img src="//images.buyacar.co.uk/img/med/{ v.car.prodHomeIntImageFileName }" alt={ v.car.imgAltString } onload="this.style.opacity = 1;" />
-							</span>
-							{ v.car.fullName }
-							<a href='http://dev2.buyacar.co.uk{ v.car.prodHomeUrlPath }deal_{ v.car.prodAdvertSeoString }.jhtml'></a>
-						</li>
-					</ul>
-				</li>
+				<search-promo if={ Array.isArray(value) === true && value.length > 0 } key={ key } value={ value } state={ state }></search-promo>
+
 			</virtual>
 		</ul>
 		<button class="btn btn_standard btn_load_more" if={ this.state.pagination > 3 } onclick={ scroll }>Load more...</button>
@@ -229,6 +263,7 @@
 			height: 	0,
 			pagination: 1,
 			disableAnimations: false,
+			supportsSnap: (("-webkit-scroll-snap-type" in document.body.style || "scroll-snap-type" in document.body.style) && ('ontouchstart' in document.body)),
 			sidebar: {
 				makes: 	[],
 				models: []
@@ -1213,13 +1248,24 @@
 		}
 
 		.search_results .search_promo_results_block {
-			overflow-x: auto;
 			white-space: nowrap;
+		}
+
+		.search_results.supportsSnap .search_promo_results_block {
+			padding: 10px 0;
+		}
+
+		.search_results.noSupportsSnap .search_promo_results_block {
+			padding: 10px 20px;
+		}
+
+		.search_results.supportsSnap .search_promo_results_block > ul {
 			-webkit-scroll-snap-type: mandatory;
 			-webkit-scroll-snap-align: start none;
 			-webkit-overflow-scrolling: touch;
 			scroll-snap-type: mandatory;
 			scroll-snap-align: start none;
+			overflow-x: auto;
 		}
 
 		.search_results .search_promo_result {
@@ -1229,8 +1275,16 @@
 			text-align: center;
 			white-space: normal;
 			width: 240px;
+			z-index: 1;
+		}
+
+		.search_results.supportsSnap .search_promo_result {
 			-webkit-scroll-snap-coordinate: 0 50%;
 			scroll-snap-coordinate: 0 50%;
+		}
+
+		.search_results.noSupportsSnap .search_promo_result {
+			transition: transform 0.15s linear;
 		}
 
 		.search_results .search_promo_result .search_result_image {
@@ -1239,6 +1293,50 @@
 			position: relative;
 			text-align: left;
 			width: 100%;
+		}
+
+		.search_results .search_promo_results_block .search_promo_nav {
+			background: linear-gradient(to right,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 50%,rgba(255,255,255,0) 100%);
+			cursor: pointer;
+			height: 100%;
+			left: 0;
+			position: absolute;
+			overflow: hidden;
+			top:  0;
+			width: 20px;
+			z-index: 2;
+			text-indent: -9999px;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+		}
+
+		.search_results .search_promo_results_block .search_promo_nav::after {
+			background-color: #ccc;
+			border: 1px solid #666;
+			content: '';
+			display: block;
+			height: 20px;
+			width: 20px;
+			position: absolute;
+			left: 10px;
+			top: calc(50% - 10px);
+			transform: rotate(45deg);
+		}
+
+		.search_results .search_promo_results_block .search_promo_nav[data-vector="gt"]::after {
+			left: auto;
+			right: 10px;
+		}
+
+		.search_results .search_promo_results_block .search_promo_nav[data-vector="gt"] {
+			background: linear-gradient(to left,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 50%,rgba(255,255,255,0) 100%);
+			left: auto;
+			right: 0;
+		}
+
+		.search_results .search_promo_results_block .search_promo_nav:active::after {
+			background-color: #ff8100;
 		}
 	</style>
 </search>
