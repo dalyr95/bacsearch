@@ -1,6 +1,6 @@
 <search-promo>
 	<li class="search_result search_promo_results_block" style="animation-delay: { state.disableAnimations === true ? 0 : opts.key * 100 + 150}ms;">
-		<div if={ state.supportsSnap === false } class="search_promo_nav" data-vector="lt" onclick={ moveBack }>
+		<div if={ state.supportsSnap === false && position > 0 } class="search_promo_nav" data-vector="lt" onclick={ moveBack }>
 			&lt;
 		</div>
 		<ul>
@@ -12,7 +12,7 @@
 				<a href='http://dev2.buyacar.co.uk{ v.car.prodHomeUrlPath }deal_{ v.car.prodAdvertSeoString }.jhtml'></a>
 			</li>
 		</ul>
-		<div if={ state.supportsSnap === false } class="search_promo_nav" data-vector="gt" onclick={ moveForward }>
+		<div if={ state.supportsSnap === false && position < value.length -1 } class="search_promo_nav" data-vector="gt" onclick={ moveForward }>
 			&gt;
 		</div>
 	</li>
@@ -27,13 +27,11 @@
 		});
 
 		moveBack = function(e) {
-			console.log('moveBack');
 			this.position--;
 			if (this.position < 0) { this.position = 0; }
 		}
 
 		moveForward = function(e) {
-			console.log('moveForward');
 			this.position++;
 			if (this.position >= this.value.length - 1) { this.position = this.value.length - 1; }
 		}
@@ -1293,6 +1291,9 @@
 			position: relative;
 			text-align: left;
 			width: 100%;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
 		}
 
 		.search_results .search_promo_results_block .search_promo_nav {
