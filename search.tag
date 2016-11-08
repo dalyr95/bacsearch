@@ -6,7 +6,7 @@
 		<ul>
 			<li each={ v, k in value } class="search_promo_result" style="transform: translateX(calc({ (position * 100) * -1 }% - { position * 10 }px));">
 				<span class="search_result_image">
-					<img src="//images.buyacar.co.uk/img/med/{ v.car.prodHomeIntImageFileName }" alt={ v.car.imgAltString } onload="this.style.opacity = 1;" />
+					<img if={ v.car.prodHomeIntImageFileName } src="//images.buyacar.co.uk/img/med/{ v.car.prodHomeIntImageFileName }" alt={ v.car.imgAltString } onload="this.style.opacity = 1;" />
 				</span>
 				{ v.car.fullName }
 				<a href='http://dev2.buyacar.co.uk{ v.car.prodHomeUrlPath }deal_{ v.car.prodAdvertSeoString }.jhtml'></a>
@@ -209,20 +209,23 @@
 		<ul>
 			<virtual each={ value, key in state.results }>
 
-				<li if={ value.type === 'result' } class="search_result" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;">
+				<li if={ value.type === 'result' } class="search_result" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;" itemprop="itemListElement" itemscope itemtype="http://schema.org/Car">
 					<span class="search_result_image">
-						<img src="//images.buyacar.co.uk/img/med/{ value.car.prodHomeIntImageFileName }" alt={ value.car.imgAltString } onload="this.style.opacity = 1;" />
+						<img if={ value.car.prodHomeIntImageFileName.length } itemprop="image" src="//images.buyacar.co.uk/img/med/{ value.car.prodHomeIntImageFileName }" alt={ value.car.imgAltString } onload="this.style.opacity = 1;" />
 					</span>
+
 					<div class="search_result_content">
 						<span>Used car - { value.car.inStockDeals === 0 ? 'in stock' : 'out of stock' }</span>
-						<h5>{ value.car.fullName }</h5>
+						<h5 itemprop="name">{ value.car.fullName }</h5>
 						<p>More info on this car</p>
 					</div>
-					<div class="search_result_price" if={ value.car.cheapestAdvertPrice }>
-						{ currency }{ value.car.cheapestAdvertPrice }
+
+					<div class="search_result_price" if={ value.car.cheapestAdvertPrice } itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
+				        <meta itemprop="priceCurrency" content="GBP" />
+						{ currency }<span itemprop="lowPrice">{ value.car.cheapestAdvertPrice }</span>
 						<p if={ value.car.cheapestFinancePaymentAmount }>Or from<strong>{ currency }{ parseInt(value.car.cheapestFinancePaymentAmount, 10) }<sup>*</sup></strong>Per Month</p>
 					</div>
-					<a href='http://dev2.buyacar.co.uk{ value.car.prodHomeUrlPath }deal_{ value.car.prodAdvertSeoString }.jhtml'></a>
+					<a itemprop="url" href='http://dev2.buyacar.co.uk{ value.car.prodHomeUrlPath }deal_{ value.car.prodAdvertSeoString }.jhtml'></a>
 				</li>
 
 				<search-promo if={ Array.isArray(value) === true && value.length > 0 } key={ key } value={ value } state={ state }></search-promo>
@@ -280,7 +283,7 @@
 				cb(JSON.parse(data.currentTarget.responseText));
 			});
 
-			xhr.open('GET', 'http://dev2.buyacar.co.uk/cars/new_cars_json.jhtml' + query, true);
+			xhr.open('GET', 'new_cars.json' + query, true);
 			xhr.send();
 
 			query = (query.length === 0) ? '?' : query;
@@ -1163,11 +1166,11 @@
 			padding:  10px;
 			position: relative;
 			overflow: hidden;
-			opacity: 0;
+			/*opacity: 0;
 			transform: translate3d(0,0,0);
 			animation-name: slideIn;
 			animation-fill-mode: forwards;
-			animation-duration: 0.2s;
+			animation-duration: 0.2s;*/
 		}
 
 		@keyframes slideIn {
