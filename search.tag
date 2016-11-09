@@ -38,6 +38,35 @@
 	</script>
 </search-promo>
 
+<car-result>
+	<li class="search_result" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;" itemprop="itemListElement" itemscope itemtype="http://schema.org/Car">
+		<span class="search_result_image">
+			<img if={ value.car.prodHomeIntImageFileName.length } itemprop="image" src="//images.buyacar.co.uk/img/med/{ value.car.prodHomeIntImageFileName }" alt={ value.car.imgAltString } onload="this.style.opacity = 1;" />
+		</span>
+
+		<div class="search_result_content">
+			<span>Used car - { value.car.inStockDeals === 0 ? 'in stock' : 'out of stock' }</span>
+			<h5 itemprop="name">{ value.car.fullName }</h5>
+			<p>More info on this car</p>
+		</div>
+
+		<div class="search_result_price" if={ value.car.cheapestAdvertPrice } itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+	        <meta itemprop="priceCurrency" content="GBP" />
+			{ currency }<span itemprop="price">{ value.car.cheapestAdvertPrice }</span>
+			<p if={ value.car.cheapestFinancePaymentAmount }>Or from<strong>{ currency }{ parseInt(value.car.cheapestFinancePaymentAmount, 10) }<sup>*</sup></strong>Per Month</p>
+		</div>
+		<a itemprop="url" href='http://dev2.buyacar.co.uk{ value.car.prodHomeUrlPath }deal_{ value.car.prodAdvertSeoString }.jhtml'></a>
+	</li>
+
+	<script>
+		this.on('update', function() {
+			this.value 	= opts.value;
+			this.state 	= opts.state;
+			this.key 	= opts.key;
+		});
+	</script>
+</car-result>
+
 <search>
 
 	<header class="header">
@@ -209,24 +238,7 @@
 		<ul>
 			<virtual each={ value, key in state.results }>
 
-				<li if={ value.type === 'result' } class="search_result" style="animation-delay: { state.disableAnimations === true ? 0 : key * 100 + 150}ms;" itemprop="itemListElement" itemscope itemtype="http://schema.org/Car">
-					<span class="search_result_image">
-						<img if={ value.car.prodHomeIntImageFileName.length } itemprop="image" src="//images.buyacar.co.uk/img/med/{ value.car.prodHomeIntImageFileName }" alt={ value.car.imgAltString } onload="this.style.opacity = 1;" />
-					</span>
-
-					<div class="search_result_content">
-						<span>Used car - { value.car.inStockDeals === 0 ? 'in stock' : 'out of stock' }</span>
-						<h5 itemprop="name">{ value.car.fullName }</h5>
-						<p>More info on this car</p>
-					</div>
-
-					<div class="search_result_price" if={ value.car.cheapestAdvertPrice } itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
-				        <meta itemprop="priceCurrency" content="GBP" />
-						{ currency }<span itemprop="lowPrice">{ value.car.cheapestAdvertPrice }</span>
-						<p if={ value.car.cheapestFinancePaymentAmount }>Or from<strong>{ currency }{ parseInt(value.car.cheapestFinancePaymentAmount, 10) }<sup>*</sup></strong>Per Month</p>
-					</div>
-					<a itemprop="url" href='http://dev2.buyacar.co.uk{ value.car.prodHomeUrlPath }deal_{ value.car.prodAdvertSeoString }.jhtml'></a>
-				</li>
+				<car-result if={ value.type === 'result' } key={ key } value={ value } state={ state }></car-result>
 
 				<search-promo if={ Array.isArray(value) === true && value.length > 0 } key={ key } value={ value } state={ state }></search-promo>
 
@@ -283,7 +295,7 @@
 				cb(JSON.parse(data.currentTarget.responseText));
 			});
 
-			xhr.open('GET', 'new_cars.json' + query, true);
+			xhr.open('GET', 'http://dev2.buyacar.co.uk/cars/new_cars_json.jhtml' + query, true);
 			xhr.send();
 
 			query = (query.length === 0) ? '?' : query;
@@ -776,7 +788,7 @@
 				this.update();
 			}.bind(this));
 
-			xhr.open('GET', 'cars.json', true);
+			xhr.open('GET', 'https://robert-daly.com/dennis/search/cars.json', true);
 			xhr.send();
 		});
 
@@ -1285,6 +1297,7 @@
 		}
 
 		.search_results.noSupportsSnap .search_promo_result {
+			transform: translate3d(0,0,0);
 			transition: transform 0.15s linear;
 		}
 
